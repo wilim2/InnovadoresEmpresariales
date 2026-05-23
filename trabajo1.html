@@ -1,0 +1,853 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+ <meta name="viewport" content="width=auto,height=auto, initial-scale=0.45, user-scalable=yes">
+    <title>Libro Digital Premium - Administración Aduanera UNAH</title>
+    <style>
+/* ==========================================================
+   IMPRESION PROFESIONAL
+   ========================================================== */
+@media print {
+
+    @page {
+        size: A4;
+        margin: 0;
+    }
+
+    body {
+        background: white !important;
+        overflow: visible !important;
+        height: auto !important;    
+        display: block !important;
+    }
+
+    .indicador-lateral {
+        display: none !important;
+    }
+
+    .area-escalable {
+        transform: scale(1) !important;
+        width: 100% !important;
+        height: auto !important;
+    }
+
+    .contenedor-libro {
+        position: static !important;
+        width: 100% !important;
+        height: auto !important;
+    }
+
+    .hoja,
+    .hoja.activa,
+    .hoja.pasada-oculta {
+        position: relative !important;
+        opacity: 1 !important;
+        visibility: visible !important;
+        transform: none !important;
+        display: flex !important;
+        page-break-after: always;
+        break-after: page;
+        width: 210mm !important;
+        height: 280mm !important;
+        margin: 0 auto !important;
+        box-shadow: none !important;
+        border-radius: 0 !important;
+        pointer-events: auto !important;
+        overflow: visible !important;
+    }
+
+    /* 👇 ESTILOS PARA LA BARRA INFERIOR */
+    .barra-inferior {
+        /* 1. Forzamos el posicionamiento */
+        position: absolute !important;
+        
+        /* 2. EL COMANDO QUE CONTROLA EL MOVIMIENTO */
+        /* Cambia este valor para subir o bajar */
+        bottom: -63px !important; 
+        
+        /* 3. Si 'bottom' no hace nada, usa esto para desplazarla píxel a píxel */
+        transform: translateY(0px) !important; 
+
+        left: 0 !important;
+        width: 100% !important;
+        height: 10px !important;
+        display: flex !important;
+        z-index: 9999 !important; /* Asegura que esté por encima de todo */
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
+    }
+    .caja-academic-bloque {
+        overflow: visible !important;
+    }
+
+    /* 👇 IMPORTANTE: EVITA LA PAGINA EN BLANCO FINAL */
+    .hoja:last-child {
+        page-break-after: auto !important;
+        break-after: auto !important;
+    }
+}
+
+
+/* ==========================================================
+   MODO MOVIL OPTIMIZADO
+   ========================================================== */
+@media screen and (max-width: 900px) {
+
+    body {
+        
+        display: block !important; 
+        overflow-x: hidden;
+        overflow-y: auto;
+touch-action: manipulation;
+        align-items: flex-start;
+        justify-content: center;
+        
+        padding: 10;
+        margin: 0;
+
+        height: auto;
+        min-height: 100vh;
+
+        background: var(--fondo-externo);
+    }
+
+    .indicador-lateral {
+        display: none !important;
+    }
+
+   .area-escalable {
+        /* Como ahora el ancho es 1080, esto ocupará casi toda la pantalla */
+        width: 1020px !important; 
+        height: auto !important;
+        margin: 20px auto !important;
+        
+        aspect-ratio: 210 / 297;
+        transform: none !important;
+        position: static !important;
+    }
+
+    .contenedor-libro {
+
+        width: 100% !important;
+        height: 100% !important;
+        display: block;
+        min-height: auto;
+
+        position: relative;
+    }
+
+    .hoja,
+    .hoja.activa,
+    .hoja.pasada-oculta {
+
+        border-radius: 0 !important;
+
+        transition: opacity 0.25s ease !important;
+
+        transform: none !important;
+    }
+
+    .hoja {
+        top: 0;
+        left: 0;
+    }
+
+    .caja-academic-bloque {
+        overflow-y: visible;
+    }
+
+    .indicador-lateral {
+        width: 50px;
+    }
+
+    .indicador-lateral::before {
+        width: 42px;
+        height: 42px;
+        font-size: 22px;
+    }
+}
+        
+        :root {
+            --azul-unah: #003a70;
+            --amarillo-unah: #f2b705;
+            --texto-oscuro: #1e293b;
+            --texto-mutado: #64748b;
+            --fondo-externo: #0f172a; 
+            --borde-sutil: #e2e8f0;
+            --blanco-pagina: #ffffff;
+            
+            /* Dimensiones base A4 fijas para proporción matemática perfecta */
+            --ancho-base: 793px;  
+            --alto-base: 1122px; 
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background-color: var(--fondo-externo);
+            font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, Roboto, sans-serif;
+            min-height: 100vh;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden; 
+            position: relative;
+            perspective: 1500px;
+        }
+
+        /* --- CONTENEDOR ENVOLTORIO RESPONSIVO (ESCALADO) --- */
+        .area-escalable {
+    width: 210mm;
+    height: 297mm;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    transform-origin: center center;
+    transition: transform 0.15s ease-out;
+    will-change: transform;
+}
+
+        /* --- VISOR CENTRAL DEL LIBRO --- */
+        .contenedor-libro {
+            width: 100%;
+            height: 100%;
+            position: center;
+            background-color: transparent;
+            z-index: 10;
+        }
+
+        /* --- HOJAS CON EFECTO DE DESPLAZAMIENTO 3D --- */
+        .hoja {
+            width: 100%;
+            height: 100%;
+            position: absolute;
+            top: 0;
+            left: 0;
+            background-color: var(--blanco-pagina);
+            padding: 60px 55px 55px 55px;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 30px 60px -15px rgba(0, 0, 0, 0.65);
+            border-radius: 8px;
+            
+            opacity: 0;
+            visibility: hidden;
+            transform: translateX(100px) scale(0.92) rotateY(-5deg);
+            transform-style: preserve-3d;
+            transition: opacity 0.55s cubic-bezier(0.34, 1.56, 0.64, 1), 
+                        transform 0.55s cubic-bezier(0.34, 1.56, 0.64, 1), 
+                        visibility 0.55s;
+            z-index: 1;
+            pointer-events: none;
+        }
+
+        .hoja.activa {
+            opacity: 1;
+            visibility: visible;
+            transform: translateX(0) scale(1) rotateY(0deg);
+            z-index: 20;
+            pointer-events: auto;
+        }
+
+        .hoja.pasada-oculta {
+            opacity: 0;
+            visibility: hidden;
+            transform: translateX(-120px) scale(0.9) rotateY(8deg);
+            z-index: 1;
+        }
+
+        /* --- BOTONES DE NAVEGACIÓN EXTREMOS --- */
+        .indicador-lateral {
+            position: fixed;
+            top: 0;
+            height: 100vh;
+            width: 80px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 100;
+            cursor: pointer;
+            user-select: none;
+            transition: all 0.3s ease;
+        }
+
+        .indicador-lateral::before {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 52px;
+            height: 52px;
+            background-color: var(--azul-unah);
+            color: #ffffff;
+            border: 2px solid var(--amarillo-unah);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 28px;
+            font-weight: bold;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
+            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .lateral-izquierdo { left: 20px; }
+        .lateral-izquierdo::before { content: '‹'; padding-right: 2px; }
+
+        .lateral-derecho { right: 20px; }
+        .lateral-derecho::before { content: '›'; padding-left: 2px; }
+
+        .indicador-lateral:hover:not(.oculto-limite)::before {
+            background-color: var(--amarillo-unah);
+            color: var(--azul-unah);
+            border-color: var(--azul-unah);
+            transform: translateY(-50%) scale(1.18);
+            box-shadow: 0 6px 22px rgba(242, 183, 5, 0.45);
+        }
+
+        .oculto-limite {
+            opacity: 0;
+            visibility: hidden;
+            pointer-events: none;
+        }
+
+        /* --- DETALLES INSTITUCIONALES --- */
+        .barra-inferior {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 10px;
+            display: flex;
+            z-index: 10;
+        }
+        .barra-azul { flex: 7; background-color: var(--azul-unah); }
+        .barra-amarilla { flex: 3; background-color: var(--amarillo-unah); }
+
+        .marca-agua-fondo {
+            position: absolute;
+            top: 55%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 480px;
+            height: 480px;
+            opacity: 0.02;
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        /* ==========================================================
+           DISEÑO DE LA PORTADA EXTENDIDA E IMPACTANTE
+           ========================================================== */
+        .portada { 
+            padding: 40px 45px;
+            justify-content: space-between;
+        }
+        .portada-bloque-superior {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border-bottom: 2px solid var(--azul-unah);
+            padding-bottom: 20px;
+            margin-bottom: 35px;
+        }
+        .unah-logo-imagen {
+            height: 80px;
+            width: auto;
+            object-fit: contain;
+        }
+        .portada-titulos-institucionales {
+            text-align: right;
+        }
+        .portada-titulos-institucionales h1 {
+            font-size: 20px;
+            color: var(--azul-unah);
+            font-weight: 900;
+            letter-spacing: 1px;
+            line-height: 1.2;
+        }
+        .portada-titulos-institucionales p {
+            font-size: 11px;
+            color: var(--texto-mutado);
+            text-transform: uppercase;
+            font-weight: 700;
+            margin-top: 4px;
+        }
+
+        /* Zona Hero Central Expandida */
+        .portada-cuerpo-central {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            margin-bottom: 40px;
+        }
+        .portada-tagline {
+            font-size: 12px;
+            font-weight: 800;
+            color: var(--amarillo-unah);
+            text-transform: uppercase;
+            letter-spacing: 5px;
+            margin-bottom: 15px;
+        }
+        .portada-titulo-macro {
+            font-size: 44px;
+            font-weight: 900;
+            color: var(--azul-unah);
+            line-height: 1.1;
+            text-transform: uppercase;
+            letter-spacing: -1px;
+            margin-bottom: 25px;
+        }
+        .portada-sub-descripcion {
+            font-size: 14px;
+            line-height: 1.6;
+            color: var(--texto-oscuro);
+            border-left: 5px solid var(--amarillo-unah);
+            padding-left: 18px;
+            text-align: justify;
+            max-width: 95%;
+        }
+
+        /* Tabla de Datos Alargada */
+        .portada-contenedor-datos {
+            background-color: #f8fafc;
+            border: 1px solid var(--borde-sutil);
+            border-radius: 6px;
+            padding: 20px 25px;
+            margin-bottom: 25px;
+        }
+        .tabla-portada { 
+            width: 100%; 
+            border-collapse: collapse; 
+        }
+        .tabla-portada td { 
+            padding: 5px 0; 
+            vertical-align: top; 
+        }
+        .label-portada { 
+            width: 20%; 
+            font-size: 11px; 
+            font-weight: 800; 
+            color: var(--texto-mutado); 
+            text-transform: uppercase; 
+            letter-spacing: 0.5px;
+        }
+        .valor-portada { 
+            width: 80%; 
+            font-size: 13.5px; 
+            color: var(--texto-oscuro); 
+        }
+        .catedratico-resaltado { 
+            font-weight: 700; 
+            color: var(--azul-unah); 
+        }
+
+        .grid-alumnos { 
+            display: flex; 
+            flex-direction: column; 
+            gap: 4px; 
+            margin-top: 2px;
+        }
+        .fila-alumno { 
+            display: flex; 
+            justify-content: space-between; 
+            background-color: #ffffff; 
+            padding: 5px 12px; 
+            border-radius: 4px; 
+            border-left: 3px solid #cbd5e1; 
+        }
+        .n-alumno { font-weight: 600; }
+        .c-alumno { font-family: monospace; font-weight: 700; color: var(--azul-unah); }
+        
+        .portada-footer-metadata { 
+            display: flex; 
+            justify-content: space-between; 
+            border-top: 1px solid var(--borde-sutil); 
+            padding-top: 15px; 
+            font-size: 11px; 
+            font-weight: 600; 
+            color: var(--texto-mutado); 
+        }
+
+        
+
+        /* ==========================================================
+           ESTILOS PARA LAS PÁGINAS DE CONTENIDO ACADÉMICO
+           ========================================================== */
+        .encabezado-contenido {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid var(--borde-sutil);
+            padding-bottom: 12px;
+            margin-bottom: 20px;
+            z-index: 5;
+        }
+
+        
+        .header-mini-logo {
+            height: 30px;
+            width: auto;
+        }
+        
+        .area-libre { flex: 1; z-index: 5; display: flex; flex-direction: column; overflow: hidden; }
+        .titulo-pagina { font-size: 19px; font-weight: 800; color: var(--azul-unah); margin-bottom: 12px; text-transform: uppercase; letter-spacing: 0.5px; }
+        
+        .caja-academic-bloque {
+            flex: 1;
+            border: 1px solid #e2e8f0;
+            background-color: #ffffff;
+            border-radius: 6px;
+            padding: 22px;
+            color: var(--texto-oscuro);
+            font-size: 13.5px;
+            line-height: 1.6;
+            outline: none;
+            overflow-y: auto;
+            text-align: justify;
+        }
+        
+        .subtitulo-bloque {
+            font-size: 14px;
+            font-weight: 700;
+            color: var(--azul-unah);
+            margin-top: 16px;
+            margin-bottom: 6px;
+            text-transform: uppercase;
+            border-left: 3px solid var(--amarillo-unah);
+            padding-left: 8px;
+        }
+
+        .lista-analitica {
+            margin-left: 18px;
+            margin-bottom: 12px;
+        }
+        .lista-analitica li {
+            margin-bottom: 6px;
+        }
+
+        .pie-contenido { border-top: 1px solid var(--borde-sutil); padding-top: 12px; display: flex; justify-content: space-between; font-size: 10px; font-weight: 600; color: var(--texto-mutado); z-index: 5; }
+        
+   </style>
+</head>
+<body> 
+
+    <div class="indicador-lateral lateral-izquierdo oculto-limite" id="controlAtras" onclick="cambiarPagina(-1)"></div>
+    <div class="indicador-lateral lateral-derecho" id="controlAdelante" onclick="cambiarPagina(1)"></div>
+
+    <div class="area-escalable" id="lienzoEscalable">
+        <div class="contenedor-libro">
+
+            <div class="hoja portada activa" id="pag-1">
+                <div class="portada-bloque-superior">
+                    <img class="unah-logo-imagen" src="https://upload.wikimedia.org/wikipedia/commons/f/f9/Logo-unah.jpg" alt="Logo UNAH">
+                    <div class="portada-titulos-institucionales">
+                        <h1>UNIVERSIDAD NACIONAL AUTÓNOMA DE HONDURAS</h1>
+                        <p>Facultad de Ciencias Económicas, Administrativas y Contables<br>Carrera de Administración Aduanera</p>
+                    </div>
+                </div>
+                <div class="portada-cuerpo-central">
+                    <span class="portada-tagline">Investigación Documental Integrada</span>
+                    <h2 class="portada-titulo-macro">Grupo: Innovadores Empresariales </h2>
+                    <p class="portada-sub-descripcion">
+                        Un desglose analítico conceptual en torno a las dimensiones epistémicas de la Administración, 
+                        la Gerencia y la Gestión. Esta investigación evalúa de forma detallada las características estructurales, 
+                        funciones operativas e interconexiones críticas que definen el éxito del ecosistema corporativo y aduanero actual.
+                    </p>
+                </div>
+
+                <div class="portada-contenedor-datos">
+                    <table class="tabla-portada">
+                        <tr>
+                            <td class="label-portada">Asignatura:</td>
+                            <td class="valor-portada" style="font-weight: 600;">Legislación y Operaciones Aduaneras Integradas</td>
+                        </tr>
+                        <tr>
+                            <td class="label-portada">Catedrático:</td>
+                            <td class="valor-portada catedratico-resaltado">Abog. Alejandro Flores Martínez</td>
+                        </tr>
+                        <tr>
+                            <td class="label-portada">Integrantes:</td>
+                            <td class="valor-portada">
+                                <div class="grid-alumnos">
+                                    <div class="fila-alumno"><span class="n-alumno">Ana Arely Meléndez Bejarano</span><span class="c-alumno">20232000150</span></div>
+                                    <div class="fila-alumno"><span class="n-alumno">Dafne Sujey Sierra López</span><span class="c-alumno">20201004489</span></div>
+                                    <div class="fila-alumno"><span class="n-alumno">Darwin Alexander Funes Hernández</span><span class="c-alumno">20221002243</span></div>
+                                    <div class="fila-alumno"><span class="n-alumno">Fanny Jackeline Mejía Inocente</span><span class="c-alumno">20242031154</span></div>
+                                    <div class="fila-alumno"><span class="n-alumno">Iveth Carolina Cruz Rodas</span><span class="c-alumno">20131005076</span></div>
+                                    <div class="fila-alumno"><span class="n-alumno">Nehemías Michael González González</span><span class="c-alumno">20231032910</span></div>
+                                    <div class="fila-alumno"><span class="n-alumno">Wilexis Gojeyry Mejía Martínez</span><span class="c-alumno">20251930203</span></div>
+                                </div>
+                            </td>
+                        </tr>
+                    </table>
+                </div>
+
+                <div class="portada-footer-metadata">
+                    <div>Tegucigalpa M.D.C., Honduras</div>
+                    <div>Página 1 de 5</div>
+                </div>
+                <div class="barra-inferior"><div class="barra-azul"></div><div class="barra-amarilla"></div></div>
+            </div>
+
+            <div class="hoja" id="pag-2">
+                <div class="encabezado-contenido">
+                    <img class="header-mini-logo" src="https://upload.wikimedia.org/wikipedia/commons/f/f9/Logo-unah.jpg" alt="Logo UNAH">
+                    <div style="font-size:10px; font-weight:700; color:var(--azul-unah); text-transform:uppercase;">Sección I: Administración</div>
+                </div>
+                <div class="area-libre">
+                    <h3 class="titulo-pagina">1. Que es la Administración?</h3>
+                    <div class="caja-academic-bloque" contenteditable="false">
+                        <p>La <strong>administración</strong> se define como una disciplina social, técnica y científica orientada al diseño, estructuración y dirección del capital y los recursos (humanos, financieros, materiales e informáticos) de una entidad organizativa. Su finalidad última consiste en canalizar estos elementos para alcanzar metas preestablecidas bajo rigurosos parámetros de eficiencia y eficacia en entornos cambiantes.</p>
+                        </br><p>Gracias a la administración, las organizaciones pueden funcionar de forma ordenada, mejorar su productividad y adaptarse a los cambios del entorno económico, social y tecnológico. La administración se aplica en empresas privadas, instituciones públicas, centros educativos, hospitales, organizaciones sin fines de lucro y gobiernos, ya que en todos estos ámbitos se requiere coordinación y toma de decisiones.</p>
+                        <div class="subtitulo-bloque">Características Esenciales</div>
+                        <ul class="lista-analitica">
+                            <li><strong>Universalidad:</strong> Es intrínseca a cualquier grupo social; se aplica de igual forma en el sector público, civil o en corporaciones privadas multinacionales.</li>
+                            <li><strong>Especificidad:</strong> A pesar de apoyarse en disciplinas contables, económicas o jurídicas, posee un método, leyes y dinámicas metodológicas completamente independientes.</li>
+                            <li><strong>Unidad Temporal:</strong> Su ejercicio es continuo y sistémico. El proceso administrativo no ocurre por etapas aisladas; todas las fases interactúan de forma simultánea en el día a día organizativo.</li>
+                            <li><strong>Amplitud de Ejercicio:</strong> Se manifiesta de forma vertical en toda la línea institucional, distribuyéndose desde los altos cargos estratégicos hasta los supervisores de menor nivel jerárquico.</li>
+                            <li><strong>Interdisciplinaria:</strong> Se apoya en ciencias como la economía, psicología, derecho y sociología.</li>
+                            <li><strong>Eficiencia:</strong> busca lograr mejores resultados utilizando la menor cantidad de recursos posibles.</li>
+                       
+                        </ul>
+
+                        <div class="subtitulo-bloque">Funciones del Proceso Administrativo</div>
+                        <p>La arquitectura del ejercicio administrativo clásico se distribuye de manera interconectada en cuatro funciones básicas:</p>
+                        <ul class="lista-analitica">
+                            <li><strong>Planeación:</strong> Diagnóstico integral del ecosistema, definición de misiones y visiones, y diseño de planes de acción estratégicos a largo plazo.</li>
+                            <li><strong>Organización:</strong> División lógica del trabajo, estructuración del organigrama institucional y asignación de flujos formales de autoridad.</li>
+                            <li><strong>Dirección:</strong> Ejecución de las pautas establecidas mediante el liderazgo, la motivación del capital humano y esquemas fluidos de comunicación asertiva.</li>
+                            <li><strong>Control:</strong> Medición sistemática del rendimiento institucional frente a KPIs para implementar acciones correctivas en tiempo real.</li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="pie-contenido"><div>Administración Aduanera — Marco Organizacional</div><div>Página 2 de 5</div></div>
+                <div class="barra-inferior"><div class="barra-azul"></div><div class="barra-amarilla"></div></div>
+            </div>
+
+            <div class="hoja" id="pag-3">
+                <div class="encabezado-contenido">
+                    <img class="header-mini-logo" src="https://upload.wikimedia.org/wikipedia/commons/f/f9/Logo-unah.jpg" alt="Logo UNAH">
+                    <div style="font-size:10px; font-weight:700; color:var(--azul-unah); text-transform:uppercase;">Sección II: Gerencia</div>
+                </div>
+                <div class="area-libre">
+                    <h3 class="titulo-pagina">2. Que es Gerencia?</h3>
+                    <div class="caja-academic-bloque" contenteditable="false">
+                        <p>La <strong>gerencia</strong> representa el órgano de alta dirección responsable de gobernar, cohesionar y pilotar una organización hacia su visión de futuro. Mientras la gestión domina el "cómo" de la operación diaria, la gerencia determina el "hacia dónde", asumiendo la toma de decisiones de alto impacto, el manejo del riesgo corporativo y la máxima representación legal y comercial de la firma.</p>
+                        <div class="subtitulo-bloque">Características Principales</div>
+                        <ul class="lista-analitica">
+                            <li><strong>Dinamismo y Resiliencia Táctica:</strong> Capacidad adaptativa de alto nivel para reconfigurar flujos de trabajo, mitigar imprevistos cotidianos y responder con agilidad a las demandas del mercado.</li>
+                            <li><strong>Foco en Micro-Procesos y Agilidad:</strong> Desglose riguroso de las metas globales en micro-tareas medibles, implementando metodologías ágiles (Scrum, Kanban) y cronogramas de corto alcance.</li>
+                            <li><strong>Optimización e Ingeniería de Procesos:</strong> Impulso constante hacia la automatización, la reingeniería y la eliminación de duplicidades para erradicar sobrecostos operativos.</li>
+                            <li><strong>Sinergia e Interconectividad de Sistemas:</strong> Garantía de fluidez técnica e interoperabilidad entre inventarios, compras, almacenes y plataformas logísticas.</li>
+                            <li><strong>Orientación Práctica a Resultados:</strong> Enfoque pragmático centrado en la ejecución de acciones concretas que transforman los planes teóricos en valor medible.</li>
+                            <li><strong>Cultura de Mejora Continua (Kaizen):</strong> Evaluación permanente de los indicadores de rendimiento para perfeccionar el desempeño e institucionalizar la excelencia.</li>
+                        </ul>
+
+                        <div class="subtitulo-bloque">Funciones Gerenciales</div>
+                        <ul class="lista-analitica">
+                            <li><strong>1. Formulación Estratégica y Propósito:</strong> Definir el ADN corporativo (misión, visión y valores) y modelar los objetivos de negocio a largo plazo que dictarán el rumbo empresarial.</li>
+                            <li><strong>2. Asignación Macroeconómica de Capital:</strong> Determinar la arquitectura presupuestaria, validando las inversiones tecnológicas, fusiones o expansiones más rentables para la compañía.</li>
+                            <li><strong>3. Desarrollo del Liderazgo y Cultura Organizacional:</strong> Inspirar, retener y alinear a los mandos medios y directores, promoviendo una cultura de alto rendimiento y valores compartidos.</li>
+                            <li><strong>4. Posicionamiento y Representación Institucional:</strong> Actuar como el principal embajador de la marca ante organismos gubernamentales, la industria, los inversionistas y los medios de comunicación.</li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="pie-contenido"><div>Administración Aduanera — Marco Organizacional</div><div>Página 3 de 5</div></div>
+                <div class="barra-inferior"><div class="barra-azul"></div><div class="barra-amarilla"></div></div>
+            </div>
+
+            <div class="hoja" id="pag-4">
+                <div class="encabezado-contenido">
+                    <img class="header-mini-logo" src="https://upload.wikimedia.org/wikipedia/commons/f/f9/Logo-unah.jpg" alt="Logo UNAH">
+                    <div style="font-size:10px; font-weight:700; color:var(--azul-unah); text-transform:uppercase;">Sección III: Gestión</div>
+                </div>
+                <div class="area-libre">
+                    <h3 class="titulo-pagina">3. Que es Gestión?</h3>
+                    <div class="caja-academic-bloque" contenteditable="false">
+                        <p>La <strong>gestión</strong> es el conjunto de procesos, actividades y acciones mediante los cuales una organización planifica, coordina, ejecuta y controla sus recursos para alcanzar objetivos previamente establecidos. Implica la aplicación práctica de conocimientos, habilidades, técnicas y herramientas que permiten transformar los planes en resultados concretos.</p>
+                    <p>La gestión constituye un elemento fundamental para el éxito de cualquier organización, ya que facilita el uso eficiente de los recursos humanos, financieros, tecnológicos y materiales. Además, permite responder de manera oportuna a los cambios del entorno, mejorar la productividad y garantizar el cumplimiento de las metas institucionales.</p>
+                            <div class="subtitulo-bloque">Características Principales</div>
+                            <ul class="lista-analitica">
+                            <li><strong>Dinamismo y Flexibilidad:</strong> Capacidad adaptativa para modificar flujos operativos ante imprevistos y cambios en el entorno de la organización.</li>
+                            <li><strong>Orientación a Objetivos y Resultados:</strong> Desglosa las metas globales en micro-procesos e hitos medibles a corto y largo alcance.</li>
+                            <li><strong>Optimización de Recursos:</strong> Integra y coordina el capital humano, financiero y tecnológico buscando la máxima eficiencia y reducción de sobrecostos.</li>
+                            <li><strong>Interconectividad y Trabajo en Equipo:</strong> Garantiza la fluidez técnica, la comunicación y la colaboración entre las diferentes áreas operacionales.</li>
+                            <li><strong>Enfoque Práctico:</strong> Se orienta a la ejecución de acciones concretas y toma de decisiones para obtener resultados tangibles.</li>
+                            <li><strong>Mejora Continua:</strong> Promueve la evaluación permanente de los procesos para perfeccionar el desempeño institucional.</li></ul>
+                        <div class="subtitulo-bloque">Funciones de la Gestión</div>
+                        <ul class="lista-analitica">
+                           <li><strong>Planificación:</strong> Consiste en establecer objetivos, definir estrategias y determinar las acciones necesarias para alcanzarlos. Permite anticiparse a posibles problemas y aprovechar oportunidades.</li>
+                            <li><strong>Planificación:</strong> Definir objetivos estratégicos, anticipar problemas y trazar las rutas de acción necesarias para alcanzarlos.</li>
+                            <li><strong>Organización:</strong> Distribuir tareas, estructurar los recursos disponibles y asignar responsabilidades claras a cada área.</li>
+                            <li><strong>Dirección y Coordinación:</strong> Orientar, motivar y unificar los esfuerzos del equipo para evitar duplicidades y trabajar en conjunto.</li>
+                            <li><strong>Control y Evaluación:</strong> Medir los resultados obtenidos frente a las metas establecidas para aplicar correcciones oportunas.</li> </div>
+                </div>
+                <div class="pie-contenido"><div>Administración Aduanera — Marco Organizacional</div><div>Página 4 de 5</div></div>
+                <div class="barra-inferior"><div class="barra-azul"></div><div class="barra-amarilla"></div></div>
+            </div>
+
+            <div class="hoja" id="pag-5">
+                <svg class="marca-agua-fondo" viewBox="0 0 60 60" fill="none" stroke="#003a70" stroke-width="1"><circle cx="30" cy="30" r="28"/><path d="M18 42 L18 22 M24 42 L24 22 M36 42 L36 22 M42 42 L42 22"/><path d="M14 42 L46 42"/><path d="M16 22 L30 14 L44 22 Z"/></svg>
+                <div class="encabezado-contenido">
+                    <img class="header-mini-logo" src="https://upload.wikimedia.org/wikipedia/commons/f/f9/Logo-unah.jpg" alt="Logo UNAH">
+                    <div style="font-size:10px; font-weight:700; color:var(--azul-unah); text-transform:uppercase;">Sección IV: Análisis Comparativo</div>
+                </div>
+                <div class="area-libre">
+                    <h3 class="titulo-pagina">4. Distinciones Semánticas y Estructurales</h3>
+                    <div class="caja-academic-bloque" contenteditable="false">
+                        <p>Aunque en el lenguaje cotidiano se suelen utilizar como sinónimos, en el ámbito corporativo y académico la <strong>Administración</strong>, la <strong>Gerencia</strong> y la <strong>Gestión</strong> operan en niveles jerárquicos y dimensiones completamente diferentes. Su separación es vital para entender la diferencia entre estructurar, liderar y ejecutar.</p> 
+                        <p>Para entender la diferencia de forma sencilla, imagiquemos que nuestra organización es un <strong>barco de expedición</strong> en busca de un tesoro. Cada concepto cumple un rol único en el viaje:</p>
+
+                        <!-- SECCIÓN: LA ANALOGÍA DEL BARCO -->
+                        <div class="subtitulo-bloque">La Analogía del Barco: ¿Quién hace qué?</div>
+                        <ul class="lista-analitica">
+                            <li><strong>La Administración (Los Dueños del Barco):</strong> Son quienes ponen el dinero, compran el barco, escriben las leyes de a bordo y definen qué es lo que se quiere buscar. Ellos no navegan, pero sin ellos no hay barco ni misión. 
+                                <br><small style="color: #666;">👉 En la empresa: Definen las políticas, las leyes internas y el presupuesto global.</small>
+                            </li>
+                            <li><strong>La Gerencia (El Capitán):</strong> Es quien está en el timón mirando el mapa a lo lejos. Decide si esquivar una tormenta, si cambiar el rumbo para llegar antes o cómo motivar a la tripulación cuando hay miedo. Es el líder que toma las decisiones difíciles.
+                                <br><small style="color: #666;">👉 En la empresa: Toma las decisiones estratégicas, soluciona problemas graves y guía al equipo.</small>
+                            </li>
+                            <li><strong>La Gestión (El Contramaestre y la Tripulación):</strong> Son los que hacen que el barco se mueva en el día a día. Se encargan de limpiar las cubiertas, revisar que la comida no se pudra, amarrar las velas y optimizar el agua. Si ellos no trabajan bien, el barco se hunde aunque el capitán sea el mejor del mundo.
+                                <br><small style="color: #666;">👉 En la empresa: Ejecuta las tareas diarias, organiza los inventarios y optimiza los procesos.</small>
+                            </li>
+                        </ul>
+                        <div class="subtitulo-bloque">En Tres Palabras</div>
+                        <div style="display: flex; gap: 15px; margin-top: 15px; flex-wrap: wrap;">
+                            <div style="flex: 1; min-width: 200px; background-color: #f9f9f9; padding: 15px; border-left: 4px solid #333;">
+                                <h4 style="margin: 0 0 5px 0;">Administración</h4>
+                                <p style="margin: 0; font-size: 14px; color: #555;"><strong>Estructura.</strong> Crea las reglas y el orden básico.</p>
+                            </div>
+                            <div style="flex: 1; min-width: 200px; background-color: #f9f9f9; padding: 15px; border-left: 4px solid #0076ff;">
+                                <h4 style="margin: 0 0 5px 0;">Gerencia</h4>
+                                <p style="margin: 0; font-size: 14px; color: #555;"><strong>Dirección.</strong> Decide el rumbo y lidera a las personas.</p>
+                            </div>
+                            <div style="flex: 1; min-width: 200px; background-color: #f9f9f9; padding: 15px; border-left: 4px solid #00b074;">
+                                <h4 style="margin: 0 0 5px 0;">Gestión</h4>
+                                <p style="margin: 0; font-size: 14px; color: #555;"><strong>Acción.</strong> Ejecuta las tareas y cuida los recursos.</p>
+                            </div>
+                        </div>
+                        <div class="subtitulo-bloque">Conclusión</div>
+<p>En conclusión, el éxito de cualquier organización depende de la sincronía perfecta entre estas tres dimensiones: la <strong>Administración</strong> construye los cimientos firmes y las reglas del juego, la <strong>Gerencia</strong> aporta la visión estratégica y el liderazgo para guiar el rumbo, y la <strong>Gestión</strong> transforma esos planes en realidades mediante una ejecución diaria eficiente. No son procesos aislados, sino un engranaje continuo donde planificar, liderar y ejecutar son indispensables para alcanzar el éxito.</p>
+
+
+
+                    
+                </div>
+                <div class="pie-contenido"><div>Administración Aduanera — Marco Organizacional</div><div>Página 5 de 5</div></div>
+                <div class="barra-inferior"><div class="barra-azul"></div><div class="barra-amarilla"></div></div>
+            </div>
+
+        </div>
+    </div>
+
+    <script>
+        let paginaActual = 1;
+        const totalPaginas = 5;
+
+        // --- SISTEMA DE ESCALADO DINÁMICO REINTERPRETADO ---
+        function adaptarLibroAlEscritorio() {
+            const lienzo = document.getElementById('lienzoEscalable');
+          if (window.innerWidth <= 900) {
+
+    lienzo.style.transform = 'scale(0.43)';
+    return;
+}
+            const margenIntermitente = 50; 
+            
+            const anchoVentana = window.innerWidth - margenIntermitente;
+            const altoVentana = window.innerHeight - margenIntermitente;
+
+            const escalaAncho = anchoVentana / 793;
+            const escalaAlto = altoVentana / 1122;
+
+            // Se toma el menor factor de escala para impedir desbordamiento visual
+            const factorEscalaFinal = Math.min(escalaAncho, escalaAlto, 1); 
+            lienzo.style.transform = `scale(${factorEscalaFinal})`;
+        }
+
+        // --- LÓGICA DE TRANSICIONES 3D SLIDE ---
+        function cambiarPagina(direccion) {
+            if ((direccion === 1 && paginaActual >= totalPaginas) || (direccion === -1 && paginaActual <= 1)) {
+                return;
+            }
+
+            const hojaSaliente = document.getElementById(`pag-${paginaActual}`);
+            if (direccion === 1) {
+                hojaSaliente.className = "hoja pasada-oculta";
+                paginaActual++;
+            } else {
+                hojaSaliente.className = "hoja";
+                paginaActual--;
+            }
+
+            const hojaEntrante = document.getElementById(`pag-${paginaActual}`);
+            hojaEntrante.className = "hoja activa";
+
+            // Manejo estricto de visibilidad de los controles
+            const ctrlAtras = document.getElementById("controlAtras");
+            const ctrlAdelante = document.getElementById("controlAdelante");
+
+            if (paginaActual === 1) ctrlAtras.classList.add("oculto-limite");
+            else ctrlAtras.classList.remove("oculto-limite");
+
+            if (paginaActual === totalPaginas) ctrlAdelante.classList.add("oculto-limite");
+            else ctrlAdelante.classList.remove("oculto-limite");
+        }
+
+        // Eventos nativos del navegador
+        window.addEventListener('resize', adaptarLibroAlEscritorio);
+        document.addEventListener('DOMContentLoaded', adaptarLibroAlEscritorio);
+
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'ArrowRight') cambiarPagina(1);
+            if (e.key === 'ArrowLeft') cambiarPagina(-1);
+        });
+
+
+        /* ==========================================================
+   NAVEGACION TOUCH / SWIPE
+   ========================================================== */
+
+let touchStartX = 0;
+let touchEndX = 0;
+
+document.addEventListener('touchstart', function(e) {
+
+    touchStartX = e.changedTouches[0].screenX;
+
+}, { passive: true });
+
+
+document.addEventListener('touchend', function(e) {
+
+    touchEndX = e.changedTouches[0].screenX;
+
+    manejarSwipe();
+
+}, { passive: true });
+
+
+function manejarSwipe() {
+
+    const diferencia = touchStartX - touchEndX;
+
+    // izquierda → siguiente
+    if (diferencia > 50) {
+        cambiarPagina(1);
+    }
+
+    // derecha → anterior
+    if (diferencia < -50) {
+        cambiarPagina(-1);
+    }
+}
+    </script>
+</body>
+</html>
