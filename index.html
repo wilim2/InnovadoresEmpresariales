@@ -3,152 +3,169 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Wilexis-dev Portafolio</title>
+    <title>Innovadores Empresariales | Portafolio</title>
     <script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
     <style>
         :root {
-            --dark-bg: #0b0b0b;
-            --deezer-gradient: linear-gradient(90deg, #ff0000, #ffed00, #00c7ff, #00ff00);
-            --accent-color: #00ffcc;
+            --dark-bg: #050505;
+            --cyber-blue: #00f2ff;
+            --neon-green: #39ff14;
+            --text-color: #e0e0e0;
         }
 
         body, html {
-            margin: 0;
+            margin: 0; 
             padding: 0;
             background-color: var(--dark-bg);
-            color: white;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            color: var(--text-color);
+            font-family: 'Segoe UI', sans-serif;
+            min-height: 100vh;
             overflow-x: hidden;
         }
 
-        /* Contenedor de Partículas */
-        #particles-js {
-            position: fixed;
-            width: 100%;
-            height: 100%;
-            z-index: -1;
+        /* Contenedor de partículas: siempre al fondo */
+        #particles-js { 
+            position: fixed; 
+            top: 0;
+            left: 0;
+            width: 100%; 
+            height: 100%; 
+            z-index: 0; 
         }
 
-        /* Header tipo Deezer */
-        header {
-            padding: 20px;
-            text-align: center;
+        /* Contenido principal: siempre al frente */
+        .main-content {
+            position: relative;
+            z-index: 1;
         }
 
-        .logo-deezer {
-            font-size: 2.5rem;
-            font-weight: bold;
-            display: inline-block;
-            background: var(--deezer-gradient);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            letter-spacing: -2px;
-            border-bottom: 5px solid;
-            border-image: var(--deezer-gradient) 1;
+        header { padding: 40px 20px; text-align: center; }
+        
+        .logo-main {
+            font-size: 2.2rem;
+            font-weight: 800;
+            color: var(--cyber-blue);
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            text-shadow: 0 0 10px rgba(0, 242, 255, 0.5);
         }
 
-        /* Layout tipo Puzzle */
         .puzzle-container {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            grid-gap: 15px;
-            padding: 40px;
-            max-width: 1200px;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            grid-gap: 20px;
+            padding: 20px;
+            max-width: 1100px;
             margin: 0 auto;
         }
 
         .puzzle-piece {
-            background: rgba(255, 255, 255, 0.05);
-            border: 1px solid rgba(0, 255, 204, 0.3);
-            padding: 25px;
+            background: rgba(20, 20, 20, 0.9);
+            border: 1px solid var(--cyber-blue);
+            padding: 30px;
             backdrop-filter: blur(5px);
-            transition: transform 0.3s ease, background 0.3s;
-            clip-path: polygon(0% 0%, 90% 0%, 100% 10%, 100% 100%, 10% 100%, 0% 90%); /* Forma irregular */
+            clip-path: polygon(0% 0%, 95% 0%, 100% 10%, 100% 100%, 5% 100%, 0% 90%);
+            transition: 0.4s;
         }
 
-        .puzzle-piece:hover {
-            transform: scale(1.05);
-            background: rgba(0, 255, 204, 0.1);
-            border-color: var(--accent-color);
-        }
+        .puzzle-piece:hover { border-color: var(--neon-green); }
 
-        .skills-list {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 10px;
-        }
+        h2 { color: var(--neon-green); margin-top: 0; font-size: 1.1rem; text-transform: uppercase; border-bottom: 1px solid #333; padding-bottom: 10px; }
 
-        .skill-tag {
-            background: #222;
-            padding: 5px 12px;
-            border-radius: 4px;
-            font-size: 0.8rem;
-            border-left: 3px solid var(--accent-color);
-        }
+        .academic-table { width: 100%; border-collapse: collapse; font-size: 0.85rem; margin-top: 15px; }
+        .academic-table th { color: var(--cyber-blue); text-align: left; padding: 8px; }
+        .academic-table td { padding: 8px; border-bottom: 1px solid #222; }
 
-        h2 { color: var(--accent-color); }
+        .eval-grid { display: grid; gap: 10px; margin-top: 15px; }
+        .eval-link {
+            padding: 12px;
+            background: rgba(0, 242, 255, 0.05);
+            text-align: center;
+            text-decoration: none;
+            color: var(--cyber-blue);
+            border: 1px solid var(--cyber-blue);
+            transition: 0.3s;
+        }
+        .eval-link:hover { background: var(--cyber-blue); color: black; font-weight: bold; }
+
+        .footer-group { 
+            position: relative;
+            z-index: 1;
+            text-align: center; 
+            padding: 40px; 
+            color: #555; 
+            letter-spacing: 2px; 
+        }
     </style>
 </head>
 <body>
 
     <div id="particles-js"></div>
 
-    <header>
-        <div class="logo-deezer">Wilexis-dev Portafolio</div>
-    </header>
+    <div class="main-content">
+        <header>
+            <div class="logo-main">Innovadores Empresariales</div>
+        </header>
 
-    <main class="puzzle-container">
-        <section class="puzzle-piece" style="grid-row: span 2;">
-            <h2>Sobre Mí</h2>
-            <p>Hola, soy <strong>Wilexis Mejía</strong>. Programador beginner apasionado por el desarrollo web y la ciberseguridad.</p>
-        </section>
+        <main class="puzzle-container">
+            <section class="puzzle-piece" style="grid-row: span 2;">
+                <h2>Información Académica</h2>
+                <p style="font-size: 0.9rem;"><strong>Asignatura:</strong> 1900-DESARROLLO GERENCIAL-TELEDOCENCIA</p>
+                <p style="font-size: 0.9rem;"><strong>Catedrático:</strong> Abog. Noe Heriberto Owen Garcia</p>
+                
+                <h3 style="font-size: 0.8rem; color: var(--cyber-blue); margin-top: 25px;">LISTADO OFICIAL DE INTEGRANTES</h3>
+                <table class="academic-table">
+                    <tr><th>Nombre</th><th>Cuenta</th></tr>
+                    <tr><td>Ana Arely Meléndez</td><td>20232000150</td></tr>
+                    <tr><td>Dafne Sujey Sierra</td><td>20201004489</td></tr>
+                    <tr><td>Darwin Alexander Funes</td><td>20221002243</td></tr>
+                    <tr><td>Fanny Jackeline Mejía</td><td>20242031154</td></tr>
+                    <tr><td>Iveth Carolina Cruz</td><td>20131005076</td></tr>
+                    <tr><td>Nehemías Michael González</td><td>20231032910</td></tr>
+                    <tr><td>Wilexis Gojeyry Mejía</td><td>20251930203</td></tr>
+                </table>
+            </section>
 
-        <section class="puzzle-piece">
-            <h2>Stack Tecnológico</h2>
-            <div class="skills-list">
-                <span class="skill-tag">PHP</span>
-                <span class="skill-tag">HTML</span>
-                <span class="skill-tag">Java</span>
-                <span class="skill-tag">JavaScript</span>
-                <span class="skill-tag">C++</span>
-                <span class="skill-tag">Python</span>
-            </div>
-        </section>
+            <section class="puzzle-piece">
+                <h2>Trabajos Realizados</h2>
+                <div class="eval-grid">
+                    <a href="trabajo1.html" target="_blank" rel="noopener noreferrer" class="eval-link">Trabajo 1: Investigacion 24/02/2926</a>
+                </div>
+            </section>
 
-        <section class="puzzle-piece">
-            <h2>Especialidad</h2>
-            <p>Enfoque en sistemas robustos y seguridad informática.</p>
-        </section>
+            <section class="puzzle-piece">
+                <h2>Evaluación Individual</h2>
+                <p style="font-size: 0.85rem; color: #aaa;">Seleccione para acceder a la hoja de evaluación:</p>
+                <div class="eval-grid">
+                    <a href="evaluacion.html" class="eval-link">Evaluación Trabajo 1</a>
+                </div>
+            </section>
+        </main>
 
-        <section class="puzzle-piece" style="grid-column: span 1;">
-            <h2>Contacto</h2>
-            <p>¿Listo para colaborar? <br> Email: wilexis@dev.com</p>
-        </section>
-    </main>
+        <footer class="footer-group">
+            UNIVERSIDAD NACIONAL AUTÓNOMA DE HONDURAS
+        </footer>
+    </div>
 
     <script>
-        /* Configuración de partículas tipo Tetris/Bloques desvaneciendo */
-        particlesJS("particles-js", {
-            "particles": {
-                "number": { "value": 60, "density": { "enable": true, "value_area": 800 } },
-                "color": { "value": "#00ffcc" },
-                "shape": { "type": "edge" }, /* Forma de cuadrado/bloque */
-                "opacity": { "value": 0.5, "random": true, "anim": { "enable": true, "speed": 1, "opacity_min": 0, "sync": false } },
-                "size": { "value": 10, "random": true },
-                "line_linked": { "enable": false }, /* Sin líneas para que parezcan piezas sueltas */
-                "move": {
-                    "enable": true,
-                    "speed": 2,
-                    "direction": "bottom", /* Caída tipo Tetris */
-                    "random": false,
-                    "straight": false,
-                    "out_mode": "out",
-                    "bounce": false
-                }
-            },
-            "interactivity": {
-                "events": { "onhover": { "enable": true, "mode": "repulse" } }
-            }
+        document.addEventListener("DOMContentLoaded", function() {
+            particlesJS("particles-js", {
+                "particles": {
+                    "number": { "value": 80, "density": { "enable": true, "value_area": 1000 } },
+                    "color": { "value": "#00f2ff" },
+                    "shape": { "type": "edge" },
+                    "opacity": { "value": 0.4 },
+                    "size": { "value": 5, "random": true },
+                    "move": { 
+                        "enable": true, 
+                        "speed": 2, 
+                        "direction": "bottom", 
+                        "straight": true, 
+                        "out_mode": "out" 
+                    }
+                },
+                "interactivity": { "events": { "onhover": { "enable": false } } }
+            });
         });
     </script>
 </body>
