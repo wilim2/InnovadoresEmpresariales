@@ -1,0 +1,449 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mapa Conceptual - Control Aduanero</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            background-color: #f8fafc;
+            color: #1e293b;
+            margin: 0;
+            padding: 30px;
+        }
+
+        .container {
+            max-width: 1300px;
+            margin: 0 auto;
+            background-color: #ffffff;
+            padding: 40px;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(15, 23, 42, 0.05);
+            border: 1px solid #e2e8f0;
+        }
+
+        /* REGLAS DE IMPRESIÓN PARA FORZAR DOS PÁGINAS SEPARADAS */
+        .page-break {
+            page-break-after: always;
+            break-after: page;
+        }
+
+        @media print {
+            body {
+                background-color: #ffffff;
+                padding: 0;
+            }
+            .container {
+                box-shadow: none;
+                border: none;
+                padding: 0;
+            }
+        }
+
+        /* PORTADA OPTIMIZADA PARA COMPLETAR UNA PÁGINA A4 RE REAL */
+        .academic-cover-page {
+            text-align: center;
+            box-sizing: border-box;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: space-between;
+            min-height: 1050px; /* Incrementado para empujar los objetos y llenar la página A4 verticalmente */
+            padding: 60px 40px;
+        }
+
+        .unah-logo {
+            width: 220px; /* Logo más grande y legible */
+            height: auto;
+            margin-bottom: 20px;
+        }
+
+        .institution-title {
+            font-size: 24px; /* Mayor tamaño */
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            color: #002f6c; /* Azul Institucional UNAH */
+            margin: 0 0 10px 0;
+        }
+
+        .faculty-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: #475569;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin: 0 0 80px 0; /* Mayor espacio de separación */
+        }
+
+        .main-heading {
+            font-size: 38px; /* Título imponente */
+            color: #0f172a;
+            margin: 0 0 15px 0;
+            font-weight: 800;
+            line-height: 1.3;
+        }
+
+        .course-title {
+            font-size: 18px; /* Subtítulo de clase ampliado */
+            color: #0284c7;
+            font-weight: 600;
+            margin: 0 0 100px 0;
+        }
+
+        /* CUADRO DE METADATOS AMPLIADO */
+        .student-metadata-box {
+            width: 100%;
+            max-width: 750px; /* Más ancho */
+            background-color: #f1f5f9;
+            padding: 35px 40px; /* Mayor espacio interno */
+            border-radius: 10px;
+            border-left: 8px solid #002f6c;
+            text-align: left;
+            margin-top: 40px;
+            box-sizing: border-box;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.02);
+        }
+
+        .metadata-row {
+            margin-bottom: 18px; /* Más separación entre filas */
+            font-size: 16px; /* Letras más grandes para lectura rápida */
+            color: #334155;
+            line-height: 1.6;
+        }
+
+        .metadata-row:last-child {
+            margin-bottom: 0;
+        }
+
+        .metadata-row strong {
+            color: #0f172a;
+            display: inline-block;
+            width: 190px; /* Más espacio para etiquetas */
+        }
+
+        /* ESTRUCTURA ORIGINAL DEL MAPA CONCEPTUAL (INTACTA Y SIMÉTRICA) */
+        .map-viewport {
+            text-align: center;
+            margin: 40px 0;
+            overflow-x: auto;
+            page-break-before: always; /* Doble seguridad de página limpia */
+        }
+
+        .concept-node {
+            display: inline-block;
+            background-color: #0f172a;
+            color: #ffffff;
+            padding: 12px 15px;
+            border-radius: 8px;
+            font-weight: bold;
+            font-size: 14px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            border: 2px solid #0f172a;
+            width: 230px; /* Tamaño fijo e idéntico para todos */
+            height: 45px;
+            box-sizing: border-box;
+            vertical-align: middle;
+            text-align: center;
+        }
+
+        .concept-node.master {
+            width: 280px;
+            height: auto;
+            font-size: 16px;
+            background-color: #0f172a;
+        }
+
+        .concept-node.primary {
+            background-color: #0284c7;
+            border-color: #0284c7;
+            font-size: 13.5px;
+            color: #ffffff;
+        }
+
+        .concept-node.secondary {
+            background-color: #ffffff;
+            color: #0f172a;
+            border: 2px solid #cbd5e1;
+            font-size: 12.5px;
+            font-weight: 600;
+        }
+
+        .connecting-word {
+            display: block;
+            font-style: italic;
+            color: #ea580c;
+            font-weight: 700;
+            font-size: 12.5px;
+            margin: 8px 0;
+            min-height: 18px;
+        }
+
+        .map-grid {
+            display: table;
+            width: 100%;
+            margin-top: 25px;
+            border-collapse: separate;
+            border-spacing: 15px 0;
+        }
+
+        .map-branch {
+            display: table-cell;
+            width: 25%;
+            vertical-align: top;
+            background-color: #f8fafc;
+            padding: 20px 12px;
+            border-radius: 8px;
+            border: 1px solid #e2e8f0;
+        }
+
+        .flow-line {
+            width: 2px;
+            height: 18px;
+            background-color: #94a3b8;
+            margin: 0 auto;
+        }
+
+        .flow-arrow {
+            width: 0;
+            height: 0;
+            border-left: 5px solid transparent;
+            border-right: 5px solid transparent;
+            border-top: 6px solid #94a3b8;
+            margin: 0 auto 8px auto;
+        }
+
+        .propositions-section {
+            margin-top: 50px;
+        }
+
+        .propositions-section h3 {
+            font-size: 18px;
+            color: #0f172a;
+            border-left: 4px solid #0284c7;
+            padding-left: 10px;
+            margin-bottom: 15px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 13px;
+            margin-top: 15px;
+        }
+
+        th {
+            background-color: #1e293b;
+            color: #ffffff;
+            text-align: left;
+            padding: 12px;
+            font-weight: 600;
+        }
+
+        td {
+            padding: 12px;
+            border: 1px solid #e2e8f0;
+        }
+
+        tr:nth-child(even) {
+            background-color: #f8fafc;
+        }
+
+        .text-concept { font-weight: 600; color: #0f172a; }
+        .text-connector { font-style: italic; color: #ea580c; font-weight: bold; }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        
+        <!-- PÁGINA 1: PORTADA ACADÉMICA AMPLIADA PARA FORMATO A4 COMPLETO -->
+        <div class="academic-cover-page page-break">
+            <div>
+                <img class="unah-logo" src="https://upload.wikimedia.org/wikipedia/commons/f/f9/Logo-unah.jpg" alt="Logo UNAH">
+                <div class="institution-title">Universidad Nacional Autónoma de Honduras</div>
+                <div class="faculty-title">Facultad de Ciencias Económicas, Administrativas y Contables</div>
+            </div>
+            
+            <div>
+                <h1 class="main-heading">Mapa Conceptual Analítico:<br>Estructura General del Control Aduanero</h1>
+                <div class="course-title">Asignatura: 0700-LEGISLACION Y PROCEDIMIENTOS ADUANEROS I-TELEDOCENCIA</div>
+            </div>
+            
+            <div class="student-metadata-box">
+                <div class="metadata-row"><strong>Estudiante:</strong> Wilexis Gojeyrys Mejia Martines</div>
+                <div class="metadata-row"><strong>Número de Cuenta:</strong> 20251930203</div>
+                <div class="metadata-row"><strong>Catedrática:</strong> ABOG. AMINTA ISABEL MARADIAGA VELA</div>
+                <div class="metadata-row"><strong>Fecha de Entrega:</strong> 25 de mayo de 2026</div>
+            </div>
+        </div>
+
+        <!-- PÁGINA 2: MAPA CONCEPTUAL (MANTIENE SIMETRÍA Y DATOS EXACTOS) -->
+        <div class="map-viewport">
+            
+            <!-- Concepto Raíz Superior -->
+            <div class="concept-node master">CONTROL ADUANERO</div>
+            
+            <span class="connecting-word">se estructura, regula y ejecuta mediante</span>
+            <div class="flow-line"></div>
+            <div class="flow-arrow"></div>
+
+            <!-- Nivel Jerárquico en 4 Columnas Integradas -->
+            <div class="map-grid">
+                
+                <!-- RAMA 1: FASES TEMPORALES -->
+                <div class="map-branch">
+                    <span class="connecting-word">se divide por su temporalidad en</span>
+                    <div class="flow-arrow"></div>
+                    <div class="concept-node primary">Fases Temporales</div>
+                    
+                    <div class="flow-line" style="height: 12px;"></div>
+                    <span class="connecting-word">antes del despacho es</span>
+                    <div class="flow-arrow"></div>
+                    <div class="concept-node secondary">Control Previo</div>
+                    
+                    <div class="flow-line" style="height: 12px;"></div>
+                    <span class="connecting-word">durante el despacho es</span>
+                    <div class="flow-arrow"></div>
+                    <div class="concept-node secondary">Control Concurrente</div>
+                    
+                    <div class="flow-line" style="height: 12px;"></div>
+                    <span class="connecting-word">después del despacho es</span>
+                    <div class="flow-arrow"></div>
+                    <div class="concept-node secondary">Control Posterior</div>
+                </div>
+
+                <!-- RAMA 2: SELECCIÓN Y CANALES -->
+                <div class="map-branch">
+                    <span class="connecting-word">se aplica según los niveles de</span>
+                    <div class="flow-arrow"></div>
+                    <div class="concept-node primary">Gestión de Riesgo</div>
+                    
+                    <div class="flow-line" style="height: 12px;"></div>
+                    <span class="connecting-word">que automatiza y asigna el</span>
+                    <div class="flow-arrow"></div>
+                    <div class="concept-node secondary">Canal de Control (Semáforo)</div>
+                    
+                    <div class="flow-line" style="height: 12px;"></div>
+                    <span class="connecting-word">verde determina</span>
+                    <div class="flow-arrow"></div>
+                    <div class="concept-node secondary" style="border-color: #10b981; background-color: #f0fdf4;">Levante Automático</div>
+                    
+                    <div class="flow-line" style="height: 12px;"></div>
+                    <span class="connecting-word">naranja exige</span>
+                    <div class="flow-arrow"></div>
+                    <div class="concept-node secondary" style="border-color: #f59e0b; background-color: #fffbeb;">Revisión Documental</div>
+                    
+                    <div class="flow-line" style="height: 12px;"></div>
+                    <span class="connecting-word">rojo obliga al</span>
+                    <div class="flow-arrow"></div>
+                    <div class="concept-node secondary" style="border-color: #ef4444; background-color: #fef2f2;">Reconocimiento Físico</div>
+                </div>
+
+                <!-- RAMA 3: DERECHOS DEL USUARIO -->
+                <div class="map-branch" style="background-color: #f0fdfa; border-color: #ccfbf1;">
+                    <span class="connecting-word">debe salvaguardar e incorporar los</span>
+                    <div class="flow-arrow"></div>
+                   <div class="concept-node primary">Derechos del Usuario</div>
+                    
+                    <div class="flow-line" style="height: 12px;"></div>
+                    <span class="connecting-word">tales como el derecho a</span>
+                    <div class="flow-arrow"></div>
+                    <div class="concept-node secondary">Información y Consulta Previa</div>
+                    
+                    <div class="flow-line" style="height: 12px;"></div>
+                    <span class="connecting-word">así como el derecho a</span>
+                    <div class="flow-arrow"></div>
+                    <div class="concept-node secondary">Impugnación y Recursos Legales</div>
+                    
+                    <div class="flow-line" style="height: 12px;"></div>
+                    <span class="connecting-word">bajo un principio de</span>
+                    <div class="flow-arrow"></div>
+                    <div class="concept-node secondary">Reserva y Confidencialidad</div>
+                </div>
+
+                <!-- RAMA 4: OBJETIVOS -->
+                <div class="map-branch">
+                    <span class="connecting-word">se orienta al cumplimiento de</span>
+                    <div class="flow-arrow"></div>
+                    <div class="concept-node primary">Objetivos Strategicos</div>
+                    
+                    <div class="flow-line" style="height: 12px;"></div>
+                    <span class="connecting-word">mediante la correcta</span>
+                    <div class="flow-arrow"></div>
+                    <div class="concept-node secondary">Recaudación de Tributos</div>
+                    
+                    <div class="flow-line" style="height: 12px;"></div>
+                    <span class="connecting-word">previniendo delitos como el</span>
+                    <div class="flow-arrow"></div>
+                    <div class="concept-node secondary">Contrabando y Fraude</div>
+                    
+                    <div class="flow-line" style="height: 12px;"></div>
+                    <span class="connecting-word">salvaguardando la</span>
+                    <div class="flow-arrow"></div>
+                    <div class="concept-node secondary">Seguridad Territorial</div>
+                </div>
+
+            </div> <!-- Fin de la grilla -->
+
+        </div>
+
+        <!-- TABLA DE PROPOSICIONES LÓGICAS (SINTAXIS ADUANERA) -->
+        <div class="propositions-section">
+            <h3>3. Matriz Lingüística de Proposiciones y Enlaces</h3>
+            <p style="font-size: 13.5px; color: #475569;">
+                Estructura de validez científica del mapa, demostrando el flujo lógico-jurídico continuo requerido en la asignatura de Legislación Aduanera:
+            </p>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Concepto Superior (Origen)</th>
+                        <th>Palabra de Enlace (Conector)</th>
+                        <th>Concepto Subordinado (Destino)</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td class="text-concept">Control Aduanero</td>
+                        <td class="text-connector">se divide por su temporalidad en</td>
+                        <td class="text-concept">Fases Temporales</td>
+                    </tr>
+                    <tr>
+                        <td class="text-concept">Control Aduanero</td>
+                        <td class="text-connector">debe salvaguardar e incorporar los</td>
+                        <td class="text-concept">Derechos del Usuario</td>
+                    </tr>
+                    <tr>
+                        <td class="text-concept">Derechos del Usuario</td>
+                        <td class="text-connector">tales como el derecho a</td>
+                        <td class="text-concept">Información y Consulta Previa</td>
+                    </tr>
+                    <tr>
+                        <td class="text-concept">Derechos del Usuario</td>
+                        <td class="text-connector">así como el derecho a</td>
+                        <td class="text-concept">Impugnación y Recursos Legales</td>
+                    </tr>
+                    <tr>
+                        <td class="text-concept">Derechos del Usuario</td>
+                        <td class="text-connector">bajo un principio de</td>
+                        <td class="text-concept">Reserva y Confidencialidad de Datos</td>
+                    </tr>
+                    <tr>
+                        <td class="text-concept">Control Aduanero</td>
+                        <td class="text-connector">se aplica según los niveles de</td>
+                        <td class="text-concept">Gestión de Riesgo</td>
+                    </tr>
+                    <tr>
+                        <td class="text-concept">Gestión de Riesgo</td>
+                        <td class="text-connector">que automatiza y asigna el</td>
+                        <td class="text-concept">Canal de Control (Semáforo)</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+    </div>
+
+</body>
+</html>
