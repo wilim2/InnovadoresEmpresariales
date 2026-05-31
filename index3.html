@@ -1,0 +1,602 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=6.0">
+    <title>Capítulo 6 - Innovadores Empresariales</title>
+    <style>
+        :root {
+            --color-libro: #1a1a1a;
+            --color-investigacion: #d93838;
+            --bg-bloque: #ffffff;
+            --bg-investigacion: #fff8f8;
+            --azul-oscuro: #1e293b;
+            --azul-branding: #0f172a;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f1f5f9;
+            color: var(--color-libro);
+            margin: 0;
+            padding: 40px 20px;
+            padding-bottom: 160px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        /* ==========================================================================
+           DISEÑO DE LA PORTADA
+           ========================================================================== */
+        .portada-a4 {
+            background: white;
+            width: 100%;
+            max-width: 800px;
+            min-height: 1050px;
+            padding: 60px;
+            border-radius: 16px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.05);
+            margin-bottom: 30px; /* Reducido de 50px a 30px para subir el contenido 20px más arriba */
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            position: relative;
+            border: 1px solid #e2e8f0;
+        }
+
+        .portada-a4::before {
+            content: "";
+            position: absolute;
+            top: 0; left: 0; right: 0;
+            height: 12px;
+            background: linear-gradient(90deg, var(--azul-oscuro), var(--color-investigacion));
+            border-radius: 16px 16px 0 0;
+        }
+
+        .portada-header {
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        .portada-header h1 {
+            font-size: 1.6rem;
+            color: var(--azul-branding);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin: 0 0 8px 0;
+            font-weight: 800;
+        }
+
+        .portada-header .sub-unah {
+            font-size: 1rem;
+            color: #64748b;
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+        }
+
+        .linea-divisora {
+            width: 100px;
+            height: 4px;
+            background-color: var(--color-investigacion);
+            margin: 20px auto;
+            border-radius: 2px;
+        }
+
+        .portada-grupo {
+            text-align: center;
+            margin: 20px 0;
+        }
+
+        .portada-grupo p {
+            font-size: 0.9rem;
+            color: #64748b;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-bottom: 5px;
+        }
+
+        .portada-grupo h2 {
+            font-size: 2.2rem;
+            color: var(--azul-oscuro);
+            margin: 0;
+            font-weight: 800;
+        }
+
+        .portada-titulo-capitulo {
+            text-align: center;
+            background: #f8fafc;
+            border: 2px dashed #e2e8f0;
+            padding: 30px;
+            border-radius: 12px;
+            margin: 40px 0;
+        }
+
+        .portada-titulo-capitulo span {
+            font-size: 1rem;
+            color: var(--color-investigacion);
+            text-transform: uppercase;
+            letter-spacing: 4px;
+            font-weight: 700;
+        }
+
+        .portada-titulo-capitulo h3 {
+            font-size: 2.6rem;
+            color: var(--azul-branding);
+            margin: 10px 0 0 0;
+            font-weight: 900;
+        }
+
+        .portada-detalles {
+            background: #fff8f8;
+            border-left: 5px solid var(--color-investigacion);
+            padding: 20px;
+            border-radius: 0 8px 8px 0;
+            margin-bottom: 40px;
+        }
+
+        .portada-detalles p {
+            margin: 8px 0;
+            font-size: 1.05rem;
+            color: #334155;
+        }
+
+        .tabla-alumnos {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+        }
+
+        .tabla-alumnos th {
+            background: var(--azul-oscuro);
+            color: white;
+            text-align: left;
+            padding: 12px 16px;
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            border-radius: 6px 6px 0 0;
+        }
+
+        .tabla-alumnos td {
+            padding: 12px 16px;
+            border-bottom: 1px solid #e2e8f0;
+            font-size: 1rem;
+            color: #334155;
+        }
+
+        .tabla-alumnos tr:last-child td {
+            border-bottom: none;
+        }
+
+        .tabla-alumnos tr:nth-child(even) {
+            background-color: #f8fafc;
+        }
+
+        /* ==========================================================================
+           CUERPO DE LECTURA Y CONTENIDO (PÁRRAFOS CLICKEABLES INDIVIDUALMENTE)
+           ========================================================================== */
+        .contenedor-lectura {
+            max-width: 800px;
+            width: 100%;
+        }
+
+        .subtitulo-seccion {
+            border-left: 4px solid var(--azul-oscuro);
+            padding-left: 12px;
+            margin-top: 45px;
+            margin-bottom: 20px;
+            color: var(--azul-oscuro);
+            font-size: 1.3rem;
+        }
+
+        .bloque-secuencia {
+            background: var(--bg-bloque);
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.02);
+            padding: 25px;
+            margin-bottom: 25px;
+            border-left: 5px solid #cbd5e1;
+            transition: all 0.3s ease;
+        }
+
+        /* Párrafos clickeables individuales */
+        .texto-libro, .texto-investigacion {
+            cursor: pointer;
+            padding: 6px;
+            border-radius: 6px;
+            transition: background-color 0.2s, color 0.2s;
+        }
+
+        .texto-libro:hover {
+            background-color: #f1f5f9;
+        }
+
+        .texto-investigacion:hover {
+            background-color: #fee2e2;
+        }
+
+        /* Estilo visual para identificar el fragmento que se está leyendo en voz alta */
+        .leyendo-activo {
+            background-color: #fef08a !important; /* Resaltador amarillo */
+            color: #000000 !important;
+        }
+
+        .texto-libro {
+            font-size: 1.1rem;
+            color: var(--color-libro);
+            margin: 0 0 10px 0;
+            text-align: justify;
+            line-height: 1.6;
+        }
+
+        .seccion-investigacion {
+            background-color: var(--bg-investigacion);
+            border-top: 1px dashed rgba(217, 56, 56, 0.25);
+            padding: 18px 20px;
+            margin-top: 18px;
+            border-radius: 6px;
+            height: auto;
+            opacity: 1;
+        }
+
+        .texto-investigacion {
+            color: var(--color-investigacion);
+            font-size: 1.05rem;
+            margin: 0;
+            font-style: italic;
+            text-align: justify;
+            line-height: 1.6;
+        }
+
+        /* ==========================================================================
+           INTERFAZ DEL ASISTENTE ANIMADO (ZORRITO 🦊)
+           ========================================================================== */
+        .asistente-avatar-container {
+            position: fixed;
+            bottom: 20px;
+            right: 30px;
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+            z-index: 1000;
+            pointer-events: none;
+        }
+
+        .burbuja-dialogo {
+            background: white;
+            border: 2px solid #1e293b;
+            border-radius: 16px;
+            padding: 14px 18px;
+            max-width: 280px;
+            font-size: 0.95rem;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+            margin-bottom: 12px;
+            position: relative;
+            pointer-events: auto;
+            line-height: 1.4;
+        }
+
+        .burbuja-dialogo::after {
+            content: ''; position: absolute; bottom: -10px; right: 35px;
+            border-width: 10px 10px 0; border-style: solid; border-color: white transparent;
+        }
+        .burbuja-dialogo::before {
+            content: ''; position: absolute; bottom: -13px; right: 34px;
+            border-width: 11px 11px 0; border-style: solid; border-color: #1e293b transparent;
+        }
+
+        .personaje {
+            font-size: 4.5rem;
+            width: 80px; height: 80px;
+            text-align: center;
+            cursor: pointer;
+            pointer-events: auto;
+            user-select: none;
+        }
+
+        @keyframes flotar {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-8px); }
+        }
+
+        @keyframes hablando {
+            0%, 100% { transform: scale(1) translateY(-4px); }
+            50% { transform: scale(0.93, 1.07) translateY(-8px); }
+        }
+
+        .asistente-avatar-container.normal .personaje { animation: flotar 3s infinite ease-in-out; }
+        .asistente-avatar-container.hablando .personaje { animation: hablando 0.45s infinite ease-in-out; }
+
+        .btn-silenciar {
+            display: block; margin-top: 8px; background: none; border: none;
+            color: #64748b; text-decoration: underline; font-size: 0.8rem; cursor: pointer;
+            padding: 0;
+        }
+        .btn-silenciar:hover { color: var(--color-investigacion); }
+
+        /* Rules for Print */
+        @media print {
+            body { background-color: transparent; padding: 0; margin: 0; }
+            .portada-a4 { box-shadow: none; border: none; margin: 0; padding: 20mm; width: 210mm; height: 297mm; page-break-after: always; border-radius: 0; }
+            .portada-a4::before { display: none; }
+            .contenedor-lectura { max-width: 100%; padding: 10mm; page-break-after: always; } /* Fuerza el salto de página al terminar cada contenedor de lectura */
+            .contenedor-lectura:last-child { page-break-after: avoid; } /* Evita una hoja en blanco innecesaria al final de la última sección */
+            .seccion-investigacion { background-color: #fff8f8 !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+            .bloque-secuencia { box-shadow: none; border: 1px solid #cbd5e1; border-left: 5px solid #64748b; page-break-inside: avoid; border-radius: 8px; }
+            .asistente-avatar-container { display: none !important; }
+            .texto-libro, .texto-investigacion { cursor: default; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="portada-a4">
+        <div class="portada-header">
+            <h1>Universidad Nacional Autónoma de Honduras</h1>
+            <div class="sub-unah">UNAH</div>
+            <div class="linea-divisora"></div>
+        </div>
+
+        <div class="portada-grupo">
+            <p>Listado Oficial de Integrantes</p>
+            <h2>Innovadores Empresariales</h2>
+        </div>
+
+        <div class="portada-titulo-capitulo">
+            <span>Asignación Académica</span>
+            <h3>CAPÍTULO 6</h3>
+        </div>
+        
+        <div>
+            <div class="portada-detalles">
+                <p><strong>Asignatura:</strong> 1900 - Desarrollo Gerencial - Teledocencia</p>
+                <p><strong>Catedrático:</strong> Abog. Noe Heriberto Owen Garcia</p>
+            </div>
+
+            <table class="tabla-alumnos">
+                <thead>
+                    <tr>
+                        <th>Nombre Completo</th>
+                        <th>Número de Cuenta</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr><td>Ana Arely Meléndez</td><td>20232000150</td></tr>
+                    <tr><td>Dafne Sujey Sierra</td><td>20201004489</td></tr>
+                    <tr><td>Darwin Alexander Funes</td><td>20221002243</td></tr>
+                    <tr><td>Fanny Jackeline Mejía</td><td>20242031154</td></tr>
+                    <tr><td>Iveth Carolina Cruz</td><td>20131005076</td></tr>
+                    <tr><td>Nehemías Michael González</td><td>20231032910</td></tr>
+                    <tr><td>Wilexis Gojeyry Mejía</td><td>20251930203</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="contenedor-lectura">
+        
+        <h3 class="subtitulo-seccion">INTRODUCCIÓN •  Resumen General</h3>
+
+        <div class="bloque-secuencia">
+            <p class="texto-libro" onclick="leerDesdeAqui(this)">
+                La toma de decisiones es una de las responsabilidades más importantes dentro de la administración. Stephen P. Robbins explica que los gerentes, independientemente del nivel jerárquico en el que se encuentren, deben tomar decisiones de forma constante. Estas decisiones influyen directamente en el funcionamiento, el rendimiento y los resultados de la organización
+            </p>
+            <p class="texto-libro" onclick="leerDesdeAqui(this)">El proceso de toma de decisiones comienza con la identificación de un problema. Un problema existe cuando se presenta una diferencia entre una situación actual y una situación deseada. Una vez detectado el problema, el gerente debe identificar los criterios de decisión, es decir, los factores relevantes que serán considerados para elegir la mejor alternativa. Posteriormente, dichos criterios son ponderados según su importancia relativa dentro de la situación que se está evaluando.
+            </p><p class="texto-libro" onclick="leerDesdeAqui(this)">Después de establecer los criterios, se desarrollan diferentes alternativas de solución. Cada alternativa es analizada cuidadosamente para determinar sus ventajas y desventajas. Finalmente, se selecciona la opción más conveniente, se implementa y se evalúan los resultados obtenidos para verificar si la decisión logró resolver el problema de manera efectiva.
+            </p>
+            
+            <div class="seccion-investigacion">
+                <p class="texto-investigacion" onclick="leerDesdeAqui(this)">
+                    <strong>Investigación del Grupo:</strong></br> En el contexto actual, donde las organizaciones enfrentan cambios rápidos y constantes, la toma de decisiones se vuelve aún más relevante. Un error en una decisión puede generar consecuencias negativas a corto y largo plazo, por lo que los administradores deben estar preparados para analizar correctamente cada situación. En la actualidad, los estudios sobre administración demuestran que los gerentes toman miles de decisiones a lo largo de su carrera profesional. Muchas de ellas parecen pequeñas, pero en conjunto determinan el desempeño de una organización. Por ello, las empresas invierten cada vez más en capacitación para fortalecer las habilidades de análisis y resolución de problemas de sus líderes.
+                    
+                </br>Pfeffer, J., & Sutton, R. I. (2006). Hard Facts, Dangerous Half-Truths, and Total Nonsense. Harvard Business School Press.
+                </p>
+            </div>
+        </div>
+
+    </div>
+
+
+    <div class="contenedor-lectura">
+        
+        <h3 class="subtitulo-seccion"> 6.1 La toma de decisiones y la administración</h3>
+
+        <div class="bloque-secuencia">
+            <p class="texto-libro" onclick="leerDesdeAqui(this)">
+                "Robbins señala que la toma de decisiones está presente en todas las funciones administrativas: planeación, organización, dirección y control. Cada vez que un gerente define objetivos, asigna recursos, lidera equipos o evalúa resultados, está tomando decisiones.
+            </p>
+            
+            <p class="texto-libro" onclick="leerDesdeAqui(this)">
+            Una decisión se define como la elección entre dos o más alternativas. Por otro lado, un problema surge cuando existe una diferencia entre lo que ocurre realmente y lo que debería ocurrir según los objetivos de la organización."  
+            </p>
+            
+            <p class="texto-libro" onclick="leerDesdeAqui(this)">
+            Los gerentes no toman decisiones de la misma manera. Robbins y Coulter explican que existen diferentes estilos de toma de decisiones que dependen de la forma de pensar de cada persona y de su tolerancia a la ambigüedad. Algunos gerentes prefieren analizar detalladamente toda la información disponible antes de actuar, mientras que otros toman decisiones con mayor rapidez utilizando su experiencia e intuición. Comprender estos estilos permite identificar fortalezas y debilidades en el proceso de decisión y mejorar la efectividad administrativa.
+             </p> 
+
+            <div class="seccion-investigacion">
+                <p class="texto-investigacion" onclick="leerDesdeAqui(this)">
+                    <strong>Investigación del Grupo:</strong> </br>
+                     Desde un punto de vista práctico, identificar correctamente el problema es fundamental. Muchas veces los gerentes se enfocan en los síntomas y no en la causa real del problema, lo que provoca que las decisiones no sean efectivas.
+                </p>
+
+                <p class="texto-investigacion" onclick="leerDesdeAqui(this)">
+                Algunas organizaciones utilizan programas informáticos especializados llamados Sistemas de Apoyo a la Decisión (DSS), los cuales ayudan a analizar información compleja y presentar diferentes escenarios antes de elegir una alternativa. Estos sistemas son ampliamente utilizados en bancos, hospitales y grandes empresas debido a la precisión que ofrecen para evaluar riesgos.
+                (Laudon, K. C., & Laudon, J. P. (2022). Sistemas de información gerencial. Pearson.)
+                </p>
+            </div>
+        </div>
+
+    </div>
+
+     <div class="contenedor-lectura">
+        
+        <h3 class="subtitulo-seccion"> 6.2 Proceso de toma de decisiones racional</h3>
+
+        <div class="bloque-secuencia">
+            <p class="texto-libro" onclick="leerDesdeAqui(this)">
+                El modelo racional de toma de decisiones describe una serie de pasos que los gerentes deberían seguir para tomar decisiones lógicas y bien fundamentadas. Este proceso inicia con la identificación del problema y finaliza con la evaluación de los resultados obtenidos.
+            </p>
+            <p class="texto-libro" onclick="leerDesdeAqui(this)">
+                Las etapas incluyen: identificar el problema, establecer criterios de decisión, asignar pesos a los criterios, desarrollar alternativas, analizarlas, seleccionar una opción, implementarla y evaluar su efectividad.
+
+            </p>
+            
+            <div class="seccion-investigacion">
+                <p class="texto-investigacion" onclick="leerDesdeAqui(this)">
+                    <strong>Investigación del Grupo:</strong> </br>
+                Aunque este modelo es ideal, en la realidad pocas veces se sigue de manera perfecta. Factores como el tiempo limitado, la presión laboral y la información incompleta dificultan la aplicación total del modelo racional.
+                </p>
+<p class="texto-investigacion" onclick="leerDesdeAqui(this)">
+                Desde una perspectiva analítica y profunda, el éxito de este proceso radica en la disciplina con la que el administrador ejecuta cada fase, evitando saltar directamente de la detección del problema a la solución sin un diagnóstico previo. Establecer criterios de decisión claros permite que la evaluación no sea puramente subjetiva, sino que responda a las necesidades técnicas, financieras y estratégicas de la empresa. Al asignar pesos a estos factores, el gerente establece una regla de medición transparente que guiará el análisis de las alternativas, reduciendo la influencia de los sesgos personales y asegurando que los recursos organizacionales se destinen a la opción con mayor probabilidad de éxito continuo.
+            
+            </p> </br></br>
+            </div>
+        </div>
+
+    </div>
+
+
+ <div class="contenedor-lectura">
+        
+        <h3 class="subtitulo-seccion"> 6.3 Tipos de decisiones</h3>
+
+        <div class="bloque-secuencia">
+            <p class="texto-libro" onclick="leerDesdeAqui(this)">
+                Robbins clasifica las decisiones en programadas y no programadas. Las decisiones programadas se aplican a problemas repetitivos y se basan en reglas, procedimientos y políticas.
+            </p>
+            <p class="texto-libro" onclick="leerDesdeAqui(this)">
+                    Las decisiones no programadas se utilizan cuando los problemas son nuevos, complejos o poco estructurados, por lo que requieren mayor análisis y criterio gerencial.
+            </p>
+
+            <p class="texto-libro" onclick="leerDesdeAqui(this)">
+                El capítulo también distingue entre decisiones programadas y no programadas. Las decisiones programadas son rutinarias y repetitivas, por lo que suelen resolverse mediante reglas o procedimientos establecidos. Por otro lado, las decisiones no programadas son novedosas, poco frecuentes y requieren soluciones específicas debido a su complejidad.
+
+            </p>
+            
+            
+            <div class="seccion-investigacion">
+                <p class="texto-investigacion" onclick="leerDesdeAqui(this)">
+                    <strong>Investigación del Grupo:</strong> </br>
+                        En los niveles más altos de la organización predominan las decisiones no programadas, ya que los directivos suelen enfrentarse a situaciones estratégicas y de alto impacto.
+                </p>
+                <p class="texto-investigacion" onclick="leerDesdeAqui(this)">
+                En el entorno empresarial contemporáneo, la frontera entre ambos tipos de decisiones está cambiando rápidamente gracias a la automatización de procesos mediante software e Inteligencia Artificial (IA). Problemas complejos que antes requerían el criterio analítico de un supervisor (como la aprobación de un crédito bancario de alto riesgo) hoy se procesan como decisiones programadas mediante algoritmos de aprendizaje automático, permitiendo que el talento humano se concentre casi exclusivamente en la alta estrategia y la gestión del cambio. (Davenport, T. H., & Harris, J. (2017). Competing on Analytics: The New Science of Winning. Harvard Business Review Press).
+            </p>
+            </div>
+        </div>
+
+    </div>
+
+
+  <div class="contenedor-lectura">
+        
+        <h3 class="subtitulo-seccion"> 6.4 Condiciones para la toma de decisiones</h3>
+
+        <div class="bloque-secuencia">
+            <p class="texto-libro" onclick="leerDesdeAqui(this)">
+            Las decisiones pueden tomarse bajo condiciones de certidumbre, riesgo o incertidumbre. En la certidumbre se conocen los resultados; en el riesgo se estiman probabilidades; y en la incertidumbre no se cuenta con información suficiente.       
+            </p>
+            <p class="texto-libro" onclick="leerDesdeAqui(this)">
+                    En la certeza se conocen completamente los resultados de cada alternativa. En el riesgo se conocen probabilidades asociadas a los posibles resultados. En la incertidumbre, los resultados son difíciles de predecir debido a la falta de información suficiente.
+
+            </p>
+            
+            <div class="seccion-investigacion">
+                <p class="texto-investigacion" onclick="leerDesdeAqui(this)">
+                    <strong>Investigación del Grupo:</strong> 
+                    Actualmente, muchas empresas utilizan herramientas tecnológicas y análisis de datos para reducir la incertidumbre y mejorar la calidad de las decisiones.
+                    El éxito de una decisión está condicionado por la cantidad, calidad y predictibilidad de la información disponible en el entorno. Robbins y Coulter enfatizan que los administradores rara vez operan en un vacío de certezas, por lo que deben aprender a calibrar sus estrategias según tres entornos financieros y operativos específicos: El Ideal de la Certidumbre, La Gestión del Riesgo, Modelos Probabilístico Y El Desafío de la Incertidumbre Absoluta.
+                </p>
+            </div>
+        </div>
+
+    </div>
+
+
+     <div class="contenedor-lectura">
+        
+        <h3 class="subtitulo-seccion"> Conclucion</h3>
+
+        <div class="bloque-secuencia">
+            <p class="texto-libro" onclick="leerDesdeAqui(this)">
+            La toma de decisiones constituye una competencia esencial para todo gerente. El capítulo demuestra que decidir implica seguir un proceso estructurado, evaluar alternativas y comprender las limitaciones humanas. La investigación complementaria muestra cómo las organizaciones actuales incorporan análisis de datos, trabajo colaborativo, ética e inteligencia artificial para fortalecer la calidad de sus decisiones.       
+            </p>
+            
+            <div class="seccion-investigacion">
+                <p class="texto-investigacion" onclick="leerDesdeAqui(this)">
+                    <strong>Concluciones del Grupo:</strong> 
+                </br>La toma de decisiones no es un evento aislado ni puramente intuitivo, sino una competencia estructural y continua que define la calidad de la gestión administrativa y la supervivencia a largo plazo de cualquier organización. A lo largo de este análisis, queda en evidencia que el ejercicio de decidir exige a los gerentes transitar de manera fluida entre la rigurosidad lógica de los procesos racionales y la flexibilidad requerida para encarar las limitaciones de tiempo, información y sesgos cognitivos propios de la naturaleza humana (Robbins & Coulter, 2021).</p>
+                <p class="texto-investigacion" onclick="leerDesdeAqui(this)">
+
+                    Las organizaciones modernas ya no pueden depender exclusivamente del "olfato comercial" o la experiencia empírica de sus líderes; la complejidad del mercado global exige una infraestructura de toma de decisiones que sea tanto sistémica como adaptable. Mientras que las decisiones programadas continuúan optimizando la eficiencia en los niveles operativos, las decisiones no programadas demandan directivos capaces de tolerar la ambigüedad y de transformar la incertidumbre cualitativa en escenarios de riesgo estadísticamente evaluables y gestionables.
+                </p>
+            </div>
+        </div>
+
+    </div>
+
+
+    <div class="asistente-avatar-container normal" id="asistente-contenedor">
+        <div class="burbuja-dialogo">
+            <span id="burbuja-texto">Haz clic en cualquier párrafo específico para adelantar o retroceder la lectura desde ese punto exacto.</span>
+            <button class="btn-silenciar" onclick="silenciar()">Silenciar Voz</button>
+        </div>
+        <div class="personaje" id="personaje-grafico" onclick="silenciar()">🦊</div>
+    </div>
+
+    <script>
+        let fraseActual = null;
+
+        function leerDesdeAqui(elemento) {
+            // 1. Frenar de golpe cualquier audio en reproducción
+            window.speechSynthesis.cancel();
+
+            // 2. Limpiar el fondo resaltado amarillo anterior si existía alguno
+            if (fraseActual) {
+                fraseActual.classList.remove('leyendo-activo');
+            }
+
+            // 3. Marcar el nuevo elemento seleccionado
+            fraseActual = elemento;
+            fraseActual.classList.add('leyendo-activo');
+
+            const contenedor = document.getElementById('asistente-contenedor');
+            const burbujaTexto = document.getElementById('burbuja-texto');
+
+            contenedor.className = "asistente-avatar-container hablando";
+            burbujaTexto.innerText = "Reproduciendo desde el punto seleccionado...";
+
+            // 4. Configurar y lanzar la voz desde el texto clickeado
+            const narracion = new SpeechSynthesisUtterance(fraseActual.innerText);
+            narracion.lang = 'es-HN';
+            narracion.rate = 1.0;
+
+            // Al terminar la frase, quita el resaltado amarillo y tranquiliza al zorro
+            narracion.onend = function() {
+                elemento.classList.remove('leyendo-activo');
+                contenedor.className = "asistente-avatar-container normal";
+                burbujaTexto.innerText = "Lectura finalizada. Elige otra sección si deseas.";
+            };
+
+            window.speechSynthesis.speak(narracion);
+        }
+
+        function silenciar() {
+            window.speechSynthesis.cancel();
+            if (fraseActual) {
+                fraseActual.classList.remove('leyendo-activo');
+            }
+            document.getElementById('asistente-contenedor').className = "asistente-avatar-container normal";
+            document.getElementById('burbuja-texto').innerText = "Voz detenida.";
+        }
+    </script>
+
+</body>
+</html>
