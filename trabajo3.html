@@ -113,7 +113,7 @@
             border: 1px solid rgba(255,255,255,0.1);
             max-width: 100%;
             overflow: auto;
-            display: none; /* Se muestra automáticamente al cargar el PDF */
+            display: none; 
         }
 
         canvas {
@@ -165,7 +165,7 @@
                 this.y = Math.random() * canvasParticles.height;
                 this.size = Math.random() * 3 + 1;
                 this.speedX = Math.random() * 0.5 - 0.25;
-                this.speedY = Math.random() * -0.5 - 0.2; // Movimiento ascendente lento
+                this.speedY = Math.random() * -0.5 - 0.2; 
                 this.alpha = Math.random() * 0.5 + 0.2;
             }
             update() {
@@ -223,12 +223,11 @@
             pageIsRendering = false,
             pageNumPending = null;
 
-        const scale = 1.3, // Puedes ajustar el zoom cambiando este número (ej. 1.5)
+        const scale = 1.3, 
               canvasPdf = document.getElementById('pdf-canvas'),
               ctxPdf = canvasPdf.getContext('2d'),
               pdfContainer = document.getElementById('pdf-container');
 
-        // Función para cargar el PDF desde una dirección URL o ruta local
         function cargarPDFDesdeDireccion(url) {
             pdfjsLib.getDocument(url).promise.then(pdfDoc_ => {
                 pdfDoc = pdfDoc_;
@@ -237,11 +236,10 @@
                 pdfContainer.style.display = 'block'; 
                 renderPage(pageNum);
             }).catch(error => {
-                console.error("Error al cargar el PDF por defecto:", error);
+                console.error("Error al cargar el PDF desde GitHub:", error);
             });
         }
 
-        // Renderizar la página
         function renderPage(num) {
             pageIsRendering = true;
             document.getElementById('page-num').textContent = num;
@@ -274,7 +272,6 @@
             }
         }
 
-        // Navegación de páginas
         document.getElementById('prev-page').addEventListener('click', () => {
             if (pdfDoc && pageNum > 1) {
                 pageNum--;
@@ -289,7 +286,6 @@
             }
         });
 
-        // Alternativa: Permitir al usuario subir otro PDF si lo desea
         document.getElementById('file-input').addEventListener('change', (e) => {
             const file = e.target.files[0];
             if (file && file.type === "application/pdf") {
@@ -309,10 +305,10 @@
         });
 
         /* ========================================================
-           3. CONFIGURACIÓN DEL ARCHIVO POR DEFECTO
+           3. CONFIGURACIÓN DEL ARCHIVO POR DEFECTO (GITHUB)
            ======================================================== */
-        // Reemplaza "mi_tarea.pdf" por el nombre de tu archivo o su enlace URL.
-        const miPdfPorDefecto = "Trabajo3.pdf"; 
+        // Usamos el enlace directo a tu archivo raw para evitar problemas de CORS
+        const miPdfPorDefecto = "https://raw.githubusercontent.com/wilim2/InnovadoresEmpresariales/main/Trabajo3.pdf"; 
 
         // Inicializar la carga automática
         cargarPDFDesdeDireccion(miPdfPorDefecto);
