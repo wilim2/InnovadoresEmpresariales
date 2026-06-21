@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lector PDF Mágico</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.4.120/pdf.min.js"></script>
+    <style>
+        /* --- Configuración Base y Fondo Animado --- */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #0f172a, #1e1b4b, #311042);
+            background-size: 400% 400%;
+            animation: gradientBg 15s ease infinite;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            overflow-x: hidden;
+            color: #fff;
+        }
+
+        @keyframes gradientBg {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        /* Lienzo para las partículas de luz */
+        #particles {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+            pointer-events: none;
+        }
+
+        /* --- Interfaz de Usuario --- */
+        .container {
+            position: relative;
+            z-index: 2;
+            width: 90%;
+            max-width: 900px;
+            margin: 30px auto;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        h1 {
+            font-weight: 300;
+            letter-spacing: 2px;
+            margin-bottom: 20px;
+            text-shadow: 0 0 10px rgba(255,255,255,0.3);
+        }
+
+        /* Barra de Controles de Vidrio (Glassmorphism) */
+        .controls {
+            background: rgba(255, 255, 255, 0.07);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 15px 25px;
+            border-radius: 50px;
+            display: flex;
+            gap: 15px;
+            align-items: center;
+            margin-bottom: 25px;
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
+        }
+
+        input[type="file"] {
+            display: none;
+        }
+
+        .btn {
+            background: rgba(255, 255, 255, 0.15);
+            color: white;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            padding: 8px 18px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+
+        .btn:hover {
+            background: rgba(255, 255, 255, 0.3);
+            box-shadow: 0 0 15px rgba(255, 255, 255, 0.4);
+            transform: translateY(-2px);
+        }
+
+        .page-info {
+            font-size: 0.9rem;
+            letter-spacing: 1px;
+        }
+
+        /* Contenedor del PDF */
+        .pdf-wrapper {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(8px);
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.4);
+            border: 1px solid rgba(255,255,255,0.1);
+            max-width: 100%;
+            overflow: auto;
+            display: none; /* Se muestra automáticamente al cargar el PDF */
+        }
+
+        canvas {
+            display: block;
+            border-radius: 8px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.5);
+        }
+    </style>
+</head>
+<body>
+
+    <canvas id="particles"></canvas>
+
+    <div class="container">
+        <h1>Lector de PDF Mágico</h1>
+
+        <div class="controls">
+            <label for="file-input" class="btn">Cambiar PDF</label>
+            <input type="file" id="file-input" accept=".pdf">
+
+            <button class="btn" id="prev-page">Anterior</button>
+            <span class="page-info">Página: <span id="page-num">0</span> / <span id="page-count">0</span></span>
+            <button class="btn" id="next-page">Siguiente</button>
+        </div>
+
+        <div class="pdf-wrapper" id="pdf-container">
+            <canvas id="pdf-canvas"></canvas>
+        </div>
+    </div>
+
+    <script>
+        /* ========================================================
+           1. SISTEMA DE PARTÍCULAS DE LUZ (Fondo Animado)
+           ======================================================== */
+        const canvasParticles = document.getElementById('particles');
+        const ctxParticles = canvasParticles.getContext('2d');
+        let particlesArray = [];
+
+        function resizeParticlesCanvas() {
+            canvasParticles.width = window.innerWidth;
+            canvasParticles.height = window.innerHeight;
+        }
+        window.addEventListener('resize', resizeParticlesCanvas);
+        resizeParticlesCanvas();
+
+        class Particle {
+            constructor() {
+                this.x = Math.random() * canvasParticles.width;
+                this.y = Math.random() * canvasParticles.height;
+                this.size = Math.random() * 3 + 1;
+                this.speedX = Math.random() * 0.5 - 0.25;
+                this.speedY = Math.random() * -0.5 - 0.2; // Movimiento ascendente lento
+                this.alpha = Math.random() * 0.5 + 0.2;
+            }
+            update() {
+                this.x += this.speedX;
+                this.y += this.speedY;
+                if (this.y < 0) {
+                    this.y = canvasParticles.height;
+                    this.x = Math.random() * canvasParticles.width;
+                }
+                if (this.x < 0 || this.x > canvasParticles.width) {
+                    this.speedX = -this.speedX;
+                }
+            }
+            draw() {
+                ctxParticles.save();
+                ctxParticles.globalAlpha = this.alpha;
+                ctxParticles.shadowBlur = 10;
+                ctxParticles.shadowColor = '#fff';
+                ctxParticles.beginPath();
+                ctxParticles.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                ctxParticles.fillStyle = 'rgba(255, 255, 255, 0.8)';
+                ctxParticles.fill();
+                ctxParticles.restore();
+            }
+        }
+
+        function initParticles() {
+            particlesArray = [];
+            const numberOfParticles = 80;
+            for (let i = 0; i < numberOfParticles; i++) {
+                particlesArray.push(new Particle());
+            }
+        }
+
+        function animateParticles() {
+            ctxParticles.clearRect(0, 0, canvasParticles.width, canvasParticles.height);
+            particlesArray.forEach(particle => {
+                particle.update();
+                particle.draw();
+            });
+            requestAnimationFrame(animateParticles);
+        }
+
+        initParticles();
+        animateParticles();
+
+
+        /* ========================================================
+           2. LÓGICA DEL LECTOR PDF (PDF.js)
+           ======================================================== */
+        pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.4.120/pdf.worker.min.js';
+
+        let pdfDoc = null,
+            pageNum = 1,
+            pageIsRendering = false,
+            pageNumPending = null;
+
+        const scale = 1.3, // Puedes ajustar el zoom cambiando este número (ej. 1.5)
+              canvasPdf = document.getElementById('pdf-canvas'),
+              ctxPdf = canvasPdf.getContext('2d'),
+              pdfContainer = document.getElementById('pdf-container');
+
+        // Función para cargar el PDF desde una dirección URL o ruta local
+        function cargarPDFDesdeDireccion(url) {
+            pdfjsLib.getDocument(url).promise.then(pdfDoc_ => {
+                pdfDoc = pdfDoc_;
+                document.getElementById('page-count').textContent = pdfDoc.numPages;
+                pageNum = 1;
+                pdfContainer.style.display = 'block'; 
+                renderPage(pageNum);
+            }).catch(error => {
+                console.error("Error al cargar el PDF por defecto:", error);
+            });
+        }
+
+        // Renderizar la página
+        function renderPage(num) {
+            pageIsRendering = true;
+            document.getElementById('page-num').textContent = num;
+
+            pdfDoc.getPage(num).then(page => {
+                const viewport = page.getViewport({ scale: scale });
+                canvasPdf.height = viewport.height;
+                canvasPdf.width = viewport.width;
+
+                const renderContext = {
+                    canvasContext: ctxPdf,
+                    viewport: viewport
+                };
+
+                page.render(renderContext).promise.then(() => {
+                    pageIsRendering = false;
+                    if (pageNumPending !== null) {
+                        renderPage(pageNumPending);
+                        pageNumPending = null;
+                    }
+                });
+            });
+        }
+
+        function queueRenderPage(num) {
+            if (pageIsRendering) {
+                pageNumPending = num;
+            } else {
+                renderPage(num);
+            }
+        }
+
+        // Navegación de páginas
+        document.getElementById('prev-page').addEventListener('click', () => {
+            if (pdfDoc && pageNum > 1) {
+                pageNum--;
+                queueRenderPage(pageNum);
+            }
+        });
+
+        document.getElementById('next-page').addEventListener('click', () => {
+            if (pdfDoc && pageNum < pdfDoc.numPages) {
+                pageNum++;
+                queueRenderPage(pageNum);
+            }
+        });
+
+        // Alternativa: Permitir al usuario subir otro PDF si lo desea
+        document.getElementById('file-input').addEventListener('change', (e) => {
+            const file = e.target.files[0];
+            if (file && file.type === "application/pdf") {
+                const fileReader = new FileReader();  
+                fileReader.onload = function() {
+                    const typedarray = new Uint8Array(this.result);
+                    pdfjsLib.getDocument(typedarray).promise.then(pdfDoc_ => {
+                        pdfDoc = pdfDoc_;
+                        document.getElementById('page-count').textContent = pdfDoc.numPages;
+                        pageNum = 1;
+                        pdfContainer.style.display = 'block';
+                        renderPage(pageNum);
+                    });
+                };
+                fileReader.readAsArrayBuffer(file);
+            }
+        });
+
+        /* ========================================================
+           3. CONFIGURACIÓN DEL ARCHIVO POR DEFECTO
+           ======================================================== */
+        // Reemplaza "mi_tarea.pdf" por el nombre de tu archivo o su enlace URL.
+        const miPdfPorDefecto = "Trabajo3.pdf"; 
+
+        // Inicializar la carga automática
+        cargarPDFDesdeDireccion(miPdfPorDefecto);
+
+    </script>
+</body>
+</html>
