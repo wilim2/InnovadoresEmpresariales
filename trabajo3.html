@@ -47,9 +47,9 @@
         .container {
             position: relative;
             z-index: 2;
-            width: 90%;
+            width: 95%; /* Un poco más ancho en móviles */
             max-width: 900px;
-            margin: 30px auto;
+            margin: 20px auto;
             display: flex;
             flex-direction: column;
             align-items: center;
@@ -59,6 +59,8 @@
             font-weight: 300;
             letter-spacing: 2px;
             margin-bottom: 20px;
+            font-size: 1.8rem; /* Tamaño responsivo */
+            text-align: center;
             text-shadow: 0 0 10px rgba(255,255,255,0.3);
         }
 
@@ -68,13 +70,15 @@
             backdrop-filter: blur(12px);
             -webkit-backdrop-filter: blur(12px);
             border: 1px solid rgba(255, 255, 255, 0.1);
-            padding: 15px 25px;
+            padding: 10px 20px;
             border-radius: 50px;
             display: flex;
-            gap: 15px;
+            gap: 10px;
             align-items: center;
             margin-bottom: 25px;
             box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
+            flex-wrap: wrap; /* Para que se acomode en pantallas muy chicas */
+            justify-content: center;
         }
 
         input[type="file"] {
@@ -85,10 +89,11 @@
             background: rgba(255, 255, 255, 0.15);
             color: white;
             border: 1px solid rgba(255, 255, 255, 0.2);
-            padding: 8px 18px;
+            padding: 6px 14px;
             border-radius: 20px;
             cursor: pointer;
             font-weight: 500;
+            font-size: 0.85rem;
             transition: all 0.3s ease;
         }
 
@@ -99,8 +104,9 @@
         }
 
         .page-info {
-            font-size: 0.9rem;
+            font-size: 0.85rem;
             letter-spacing: 1px;
+            white-space: nowrap;
         }
 
         /* Contenedor del PDF */
@@ -108,18 +114,22 @@
             background: rgba(255, 255, 255, 0.05);
             backdrop-filter: blur(8px);
             border-radius: 15px;
-            padding: 20px;
+            padding: 10px; /* Reducido para pantallas pequeñas */
             box-shadow: 0 20px 50px rgba(0,0,0,0.4);
             border: 1px solid rgba(255,255,255,0.1);
+            width: 100%;
             max-width: 100%;
-            overflow: auto;
+            overflow-x: auto; /* Permite scroll horizontal solo si es extremadamente necesario */
             display: none; 
         }
 
         canvas {
             display: block;
+            margin: 0 auto;
             border-radius: 8px;
             box-shadow: 0 4px 20px rgba(0,0,0,0.5);
+            max-width: 100%; /* Evita que el canvas se desborde del contenedor */
+            height: auto !important; /* Mantiene la proporción correcta */
         }
     </style>
 </head>
@@ -194,7 +204,7 @@
 
         function initParticles() {
             particlesArray = [];
-            const numberOfParticles = 80;
+            const numberOfParticles = 60; // Optimizado para rendimiento móvil
             for (let i = 0; i < numberOfParticles; i++) {
                 particlesArray.push(new Particle());
             }
@@ -214,7 +224,7 @@
 
 
         /* ========================================================
-           2. LÓGICA DEL LECTOR PDF (PDF.js)
+           2. LÓGICA DEL LECTOR PDF (PDF.js) RESPONSIVO
            ======================================================== */
         pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.4.120/pdf.worker.min.js';
 
@@ -223,8 +233,7 @@
             pageIsRendering = false,
             pageNumPending = null;
 
-        const scale = 1.3, 
-              canvasPdf = document.getElementById('pdf-canvas'),
+        const canvasPdf = document.getElementById('pdf-canvas'),
               ctxPdf = canvasPdf.getContext('2d'),
               pdfContainer = document.getElementById('pdf-container');
 
@@ -240,12 +249,28 @@
             });
         }
 
+        // Renderizar la página adaptándose dinámicamente al tamaño de pantalla
         function renderPage(num) {
             pageIsRendering = true;
             document.getElementById('page-num').textContent = num;
 
             pdfDoc.getPage(num).then(page => {
-                const viewport = page.getViewport({ scale: scale });
+                // 1. Calculamos el ancho disponible en el contenedor actual
+                const contenedorAncho = pdfContainer.clientWidth - 20; // Restamos el padding interno
+                
+                // 2. Obtenemos el tamaño original de la página del PDF (escala 1)
+                const vistaPreviaViewport = page.getViewport({ scale: 1 });
+                
+                // 3. Calculamos la escala exacta para que el PDF llene el contenedor perfectamente
+                let escalaDinamica = contenedorAncho / vistaPreviaViewport.width;
+                
+                // Limitamos la escala máxima en computadoras para que no se vea gigante en monitores enormes
+                if (escalaDinamica > 1.4) {
+                    escalaDinamica = 1.4;
+                }
+
+                // 4. Aplicamos la escala calculada
+                const viewport = page.getViewport({ scale: escalaDinamica });
                 canvasPdf.height = viewport.height;
                 canvasPdf.width = viewport.width;
 
@@ -272,6 +297,14 @@
             }
         }
 
+        // Recalcular tamaño si el usuario voltea el teléfono o cambia el tamaño de ventana
+        window.addEventListener('resize', () => {
+            if (pdfDoc) {
+                queueRenderPage(pageNum);
+            }
+        });
+
+        // Navegación
         document.getElementById('prev-page').addEventListener('click', () => {
             if (pdfDoc && pageNum > 1) {
                 pageNum--;
@@ -307,10 +340,9 @@
         /* ========================================================
            3. CONFIGURACIÓN DEL ARCHIVO POR DEFECTO (GITHUB)
            ======================================================== */
-        // Usamos el enlace directo a tu archivo raw para evitar problemas de CORS
         const miPdfPorDefecto = "https://raw.githubusercontent.com/wilim2/InnovadoresEmpresariales/main/Trabajo3.pdf"; 
 
-        // Inicializar la carga automática
+        // Inicializar
         cargarPDFDesdeDireccion(miPdfPorDefecto);
 
     </script>
