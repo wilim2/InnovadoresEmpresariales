@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Innovadores Empresariales</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.4.120/pdf.min.js"></script>
+    <style>
+        /* --- Configuración Base y Fondo Animado --- */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #0f172a, #1e1b4b, #311042);
+            background-size: 400% 400%;
+            animation: gradientBg 15s ease infinite;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            overflow-x: hidden;
+            color: #fff;
+        }
+
+        @keyframes gradientBg {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        /* Lienzo para las partículas de luz */
+        #particles {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+            pointer-events: none;
+        }
+
+        /* --- Interfaz de Usuario --- */
+        .container {
+            position: relative;
+            z-index: 2;
+            width: 95%; /* Un poco más ancho en móviles */
+            max-width: 900px;
+            margin: 20px auto;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        h1 {
+            font-weight: 300;
+            letter-spacing: 2px;
+            margin-bottom: 20px;
+            font-size: 1.8rem; /* Tamaño responsivo */
+            text-align: center;
+            text-shadow: 0 0 10px rgba(255,255,255,0.3);
+        }
+
+        /* Barra de Controles de Vidrio (Glassmorphism) */
+        .controls {
+            background: rgba(255, 255, 255, 0.07);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 10px 20px;
+            border-radius: 50px;
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            margin-bottom: 25px;
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
+            flex-wrap: wrap; /* Para que se acomode en pantallas muy chicas */
+            justify-content: center;
+        }
+
+        input[type="file"] {
+            display: none;
+        }
+
+        .btn {
+            background: rgba(255, 255, 255, 0.15);
+            color: white;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            padding: 6px 14px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-weight: 500;
+            font-size: 0.85rem;
+            transition: all 0.3s ease;
+        }
+
+        .btn:hover {
+            background: rgba(255, 255, 255, 0.3);
+            box-shadow: 0 0 15px rgba(255, 255, 255, 0.4);
+            transform: translateY(-2px);
+        }
+
+        .page-info {
+            font-size: 0.85rem;
+            letter-spacing: 1px;
+            white-space: nowrap;
+        }
+
+        /* Contenedor del PDF */
+        .pdf-wrapper {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(8px);
+            border-radius: 15px;
+            padding: 10px; /* Reducido para pantallas pequeñas */
+            box-shadow: 0 20px 50px rgba(0,0,0,0.4);
+            border: 1px solid rgba(255,255,255,0.1);
+            width: 100%;
+            max-width: 100%;
+            overflow-x: auto; /* Permite scroll horizontal solo si es extremadamente necesario */
+            display: none; 
+        }
+
+        canvas {
+            display: block;
+            margin: 0 auto;
+            border-radius: 8px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.5);
+            max-width: 100%; /* Evita que el canvas se desborde del contenedor */
+            height: auto !important; /* Mantiene la proporción correcta */
+        }
+    </style>
+</head>
+<body>
+
+    <canvas id="particles"></canvas>
+
+    <div class="container">
+        <h1>Innovadores Empresarailes Lector de Textos</h1>
+
+        <div class="controls">
+            <label for="file-input" class="btn">Cambiar PDF</label>
+            <input type="file" id="file-input" accept=".pdf">
+
+            <button class="btn" id="prev-page">Anterior</button>
+            <span class="page-info">Página: <span id="page-num">0</span> / <span id="page-count">0</span></span>
+            <button class="btn" id="next-page">Siguiente</button>
+        </div>
+
+        <div class="pdf-wrapper" id="pdf-container">
+            <canvas id="pdf-canvas"></canvas>
+        </div>
+    </div>
+
+    <script>
+        /* ========================================================
+           1. SISTEMA DE PARTÍCULAS DE LUZ (Fondo Animado)
+           ======================================================== */
+        const canvasParticles = document.getElementById('particles');
+        const ctxParticles = canvasParticles.getContext('2d');
+        let particlesArray = [];
+
+        function resizeParticlesCanvas() {
+            canvasParticles.width = window.innerWidth;
+            canvasParticles.height = window.innerHeight;
+        }
+        window.addEventListener('resize', resizeParticlesCanvas);
+        resizeParticlesCanvas();
+
+        class Particle {
+            constructor() {
+                this.x = Math.random() * canvasParticles.width;
+                this.y = Math.random() * canvasParticles.height;
+                this.size = Math.random() * 3 + 1;
+                this.speedX = Math.random() * 0.5 - 0.25;
+                this.speedY = Math.random() * -0.5 - 0.2; 
+                this.alpha = Math.random() * 0.5 + 0.2;
+            }
+            update() {
+                this.x += this.speedX;
+                this.y += this.speedY;
+                if (this.y < 0) {
+                    this.y = canvasParticles.height;
+                    this.x = Math.random() * canvasParticles.width;
+                }
+                if (this.x < 0 || this.x > canvasParticles.width) {
+                    this.speedX = -this.speedX;
+                }
+            }
+            draw() {
+                ctxParticles.save();
+                ctxParticles.globalAlpha = this.alpha;
+                ctxParticles.shadowBlur = 10;
+                ctxParticles.shadowColor = '#fff';
+                ctxParticles.beginPath();
+                ctxParticles.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                ctxParticles.fillStyle = 'rgba(255, 255, 255, 0.8)';
+                ctxParticles.fill();
+                ctxParticles.restore();
+            }
+        }
+
+        function initParticles() {
+            particlesArray = [];
+            const numberOfParticles = 60; // Optimizado para rendimiento móvil
+            for (let i = 0; i < numberOfParticles; i++) {
+                particlesArray.push(new Particle());
+            }
+        }
+
+        function animateParticles() {
+            ctxParticles.clearRect(0, 0, canvasParticles.width, canvasParticles.height);
+            particlesArray.forEach(particle => {
+                particle.update();
+                particle.draw();
+            });
+            requestAnimationFrame(animateParticles);
+        }
+
+        initParticles();
+        animateParticles();
+
+
+        /* ========================================================
+           2. LÓGICA DEL LECTOR PDF (PDF.js) RESPONSIVO
+           ======================================================== */
+        pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.4.120/pdf.worker.min.js';
+
+        let pdfDoc = null,
+            pageNum = 1,
+            pageIsRendering = false,
+            pageNumPending = null;
+
+        const canvasPdf = document.getElementById('pdf-canvas'),
+              ctxPdf = canvasPdf.getContext('2d'),
+              pdfContainer = document.getElementById('pdf-container');
+
+        function cargarPDFDesdeDireccion(url) {
+            pdfjsLib.getDocument(url).promise.then(pdfDoc_ => {
+                pdfDoc = pdfDoc_;
+                document.getElementById('page-count').textContent = pdfDoc.numPages;
+                pageNum = 1;
+                pdfContainer.style.display = 'block'; 
+                renderPage(pageNum);
+            }).catch(error => {
+                console.error("Error al cargar el PDF desde GitHub:", error);
+            });
+        }
+
+        // Renderizar la página adaptándose dinámicamente al tamaño de pantalla
+        function renderPage(num) {
+            pageIsRendering = true;
+            document.getElementById('page-num').textContent = num;
+
+            pdfDoc.getPage(num).then(page => {
+                // 1. Calculamos el ancho disponible en el contenedor actual
+                const contenedorAncho = pdfContainer.clientWidth - 20; // Restamos el padding interno
+                
+                // 2. Obtenemos el tamaño original de la página del PDF (escala 1)
+                const vistaPreviaViewport = page.getViewport({ scale: 1 });
+                
+                // 3. Calculamos la escala exacta para que el PDF llene el contenedor perfectamente
+                let escalaDinamica = contenedorAncho / vistaPreviaViewport.width;
+                
+                // Limitamos la escala máxima en computadoras para que no se vea gigante en monitores enormes
+                if (escalaDinamica > 1.4) {
+                    escalaDinamica = 1.4;
+                }
+
+                // 4. Aplicamos la escala calculada
+                const viewport = page.getViewport({ scale: escalaDinamica });
+                canvasPdf.height = viewport.height;
+                canvasPdf.width = viewport.width;
+
+                const renderContext = {
+                    canvasContext: ctxPdf,
+                    viewport: viewport
+                };
+
+                page.render(renderContext).promise.then(() => {
+                    pageIsRendering = false;
+                    if (pageNumPending !== null) {
+                        renderPage(pageNumPending);
+                        pageNumPending = null;
+                    }
+                });
+            });
+        }
+
+        function queueRenderPage(num) {
+            if (pageIsRendering) {
+                pageNumPending = num;
+            } else {
+                renderPage(num);
+            }
+        }
+
+        // Recalcular tamaño si el usuario voltea el teléfono o cambia el tamaño de ventana
+        window.addEventListener('resize', () => {
+            if (pdfDoc) {
+                queueRenderPage(pageNum);
+            }
+        });
+
+        // Navegación
+        document.getElementById('prev-page').addEventListener('click', () => {
+            if (pdfDoc && pageNum > 1) {
+                pageNum--;
+                queueRenderPage(pageNum);
+            }
+        });
+
+        document.getElementById('next-page').addEventListener('click', () => {
+            if (pdfDoc && pageNum < pdfDoc.numPages) {
+                pageNum++;
+                queueRenderPage(pageNum);
+            }
+        });
+
+        document.getElementById('file-input').addEventListener('change', (e) => {
+            const file = e.target.files[0];
+            if (file && file.type === "application/pdf") {
+                const fileReader = new FileReader();  
+                fileReader.onload = function() {
+                    const typedarray = new Uint8Array(this.result);
+                    pdfjsLib.getDocument(typedarray).promise.then(pdfDoc_ => {
+                        pdfDoc = pdfDoc_;
+                        document.getElementById('page-count').textContent = pdfDoc.numPages;
+                        pageNum = 1;
+                        pdfContainer.style.display = 'block';
+                        renderPage(pageNum);
+                    });
+                };
+                fileReader.readAsArrayBuffer(file);
+            }
+        });
+
+        /* ========================================================
+           3. CONFIGURACIÓN DEL ARCHIVO POR DEFECTO (GITHUB)
+           ======================================================== */
+        const miPdfPorDefecto = "https://raw.githubusercontent.com/wilim2/InnovadoresEmpresariales/main/Trabajo3.pdf"; 
+
+        // Inicializar
+        cargarPDFDesdeDireccion(miPdfPorDefecto);
+
+    </script>
+</body>
+</html>
