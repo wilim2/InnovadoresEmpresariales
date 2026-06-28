@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hoja de Evaluación | Innovadores Empresariales</title>
+    <script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
+    <style>
+        :root {
+            --dark-bg: #050505;
+            --cyber-blue: #00f2ff;
+            --neon-green: #39ff14;
+            --text-color: #e0e0e0;
+        }
+
+        body, html {
+            margin: 0; padding: 0;
+            background-color: var(--dark-bg);
+            color: var(--text-color);
+            font-family: 'Segoe UI', sans-serif;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        #particles-js { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 0; }
+
+        .main-content { position: relative; z-index: 1; padding: 40px 20px; }
+
+        .container { 
+            max-width: 800px; 
+            margin: auto; 
+            background: rgba(20, 20, 20, 0.9);
+            border: 1px solid var(--cyber-blue); 
+            padding: 30px; 
+            backdrop-filter: blur(5px);
+            clip-path: polygon(0% 0%, 95% 0%, 100% 5%, 100% 100%, 5% 100%, 0% 95%);
+        }
+
+        h1 { color: var(--neon-green); text-align: center; text-transform: uppercase; letter-spacing: 2px; }
+        
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        th, td { padding: 15px; border-bottom: 1px solid #333; text-align: left; }
+        th { color: var(--cyber-blue); text-transform: uppercase; font-size: 0.9rem; }
+        
+        .score { color: var(--neon-green); font-weight: bold; font-family: monospace; font-size: 1.2rem; }
+        
+        .btn-back { 
+            display: block; 
+            width: 200px; 
+            margin: 40px auto 0; 
+            padding: 12px; 
+            text-align: center; 
+            background: transparent; 
+            color: var(--cyber-blue); 
+            text-decoration: none; 
+            font-weight: bold; 
+            border: 1px solid var(--cyber-blue);
+            transition: 0.3s;
+            text-transform: uppercase;
+        }
+        .btn-back:hover { background: var(--cyber-blue); color: black; box-shadow: 0 0 15px var(--cyber-blue); }
+    </style>
+</head>
+<body>
+
+    <div id="particles-js"></div>
+
+    <div class="main-content">
+        <div class="container">
+            <h1>Hoja de Evaluación Individual - Trabajo 4</h1>
+            <p style="text-align: center; color: #888; font-size: 0.9rem;">Desempeño Grupal - Innovadores Empresariales</p>
+            
+            <table>
+                <thead>
+                    <tr>
+                        <th>Integrante del Grupo</th>
+                        <th>Calificación</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr><td>Ana Arely Meléndez Bejarano</td><td class="score">10/10</td></tr>
+                    <tr><td>Dafne Sujey Sierra López</td><td class="score">10/10</td></tr>
+                    <tr><td>Darwin Alexander Funes Hernández</td><td class="score">10/10</td></tr>
+                    <tr><td>Fanny Jackeline Mejía Inocente</td><td class="score">8/10</td></tr>
+                    <tr><td>Iveth Carolina Cruz Rodas</td><td class="score">10/10</td></tr>
+                    <tr><td>Nehemías Michael González González</td><td class="score">10/10</td></tr>
+                    <tr><td>Wilexis Gojeyry Mejía Martínez</td><td class="score">10/10</td></tr>
+                </tbody>
+            </table>
+            
+            <a href="index.html" class="btn-back">Volver al Dashboard</a>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            particlesJS("particles-js", {
+                "particles": {
+                    "number": { "value": 80, "density": { "enable": true, "value_area": 1000 } },
+                    "color": { "value": "#00f2ff" },
+                    "shape": { "type": "edge" },
+                    "opacity": { "value": 0.4 },
+                    "size": { "value": 5, "random": true },
+                    "move": { "enable": true, "speed": 2, "direction": "bottom", "straight": true, "out_mode": "out" }
+                },
+                "interactivity": { "events": { "onhover": { "enable": false } } }
+            });
+        });
+    </script>
+</body>
+</html>
